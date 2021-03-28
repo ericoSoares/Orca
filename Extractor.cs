@@ -49,7 +49,7 @@ namespace tcc
 				var solution = workspace.OpenSolutionAsync(SlnPath).Result;
 				foreach (var proj in solution.Projects)
 				{
-					Console.WriteLine(proj.Name);
+					Console.WriteLine("Project: " + proj.Name);
 					foreach(var doc in proj.Documents)
 					{
 						var tree = doc.GetSyntaxTreeAsync().Result;
@@ -66,8 +66,7 @@ namespace tcc
 						if (porra != null)
 						{
 							var porra2 = model.GetDeclaredSymbol(porra);
-							Console.WriteLine(porra.Identifier);
-							Console.WriteLine("---" + porra2);
+							Console.WriteLine("Class: " + porra.Identifier + " | Type: "+ porra2);
 						}
 
 					}
