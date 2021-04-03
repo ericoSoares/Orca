@@ -111,6 +111,10 @@ namespace HelloWorld
             var project2 = @"C:\Users\erico\source\repos\TestProject\TestProject.sln";
             var extractor = new Extractor(project1);
             extractor.ReadSolution();
+            var aaa = extractor.Repository.Entities.ToList();
+            var xx = aaa.Where(r => r.Type == tcc.Models.EEntityType.CLASS).ToList();
+            var xxx = aaa.Where(r => r.Type == tcc.Models.EEntityType.INTERFACE).ToList();
+            var x = 1;
         }
     }
 }
