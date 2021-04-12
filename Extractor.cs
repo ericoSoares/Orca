@@ -11,28 +11,6 @@ using Newtonsoft.Json;
 
 namespace tcc
 {
-	public class ConstructorSyntaxWalker : CSharpSyntaxWalker
-	{
-		public List<ISymbol> Parameters { get; set; }
-		public int IfConditions { get; set; }
-
-		SemanticModel sm;
-
-
-		public ConstructorSyntaxWalker(SemanticModel sm)
-		{
-			this.sm = sm;
-			Parameters = new List<ISymbol>();
-		}
-
-		public override void VisitIfStatement(IfStatementSyntax node)
-		{
-			Parameters.AddRange(sm.AnalyzeDataFlow(node).DataFlowsIn); // .AnalyzeDataFlow() is one of the most commonly used parts of the platform: it requires a compilation to work off and allows tracking dependencies. We could then check if these parameters are supplied to constructor and make a call whether this is allowed 
-			IfConditions++; // just count for now, nothing fancy
-			base.VisitIfStatement(node);
-		}
-	}
-
 	class Extractor
     {
         private string SlnPath { get; set; }
@@ -82,9 +60,31 @@ namespace tcc
 					AccessModifier = classDeclaration.Modifiers.ToString(),
 					Type = Models.EEntityType.CLASS
 				});
+
+				var baseList = classDeclaration.BaseList?.DescendantNodes().OfType<SimpleBaseTypeSyntax>().ToList();
+				if (baseList == null) continue;
+
+				foreach(var baseItem in baseList) {
+					Console.WriteLine("Inherits from:" + baseItem.Type.ToString());
+				}
+
+				this.ExtractInstantiations(classDeclaration, semanticModel);
 			}
 		}
 
+		public void ExtractInstantiations(ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
+		{
+			var objCreations = classDeclaration
+				.DescendantNodes().OfType<ObjectCreationExpressionSyntax>().ToList();
+			
+			foreach(var objCreation in objCreations)
+            {
+				var typeInfo = semanticModel.GetTypeInfo(objCreation);
+
+                Console.WriteLine(
+					"Obj creation in class: " + classDeclaration.Identifier + " class: " + typeInfo.Type);
+            }
+		}
 
 		public void ReadSolution()
         {
@@ -98,7 +98,8 @@ namespace tcc
 				foreach (var proj in solution.Projects)
 				{
 					Console.WriteLine("Project: " + proj.Name);
-					foreach(var doc in proj.Documents)
+
+					foreach (var doc in proj.Documents)
 					{
 						this.ExtractEntities(doc.GetSyntaxTreeAsync().Result);
 					}

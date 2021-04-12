@@ -109,7 +109,7 @@ namespace HelloWorld
 
             var project1 = @"C:\Users\erico\source\repos\clean-architecture-manga\Clean-Architecture-Manga.sln";
             var project2 = @"C:\Users\erico\source\repos\TestProject\TestProject.sln";
-            var extractor = new Extractor(project1);
+            var extractor = new Extractor(project2);
             extractor.ReadSolution();
             var aaa = extractor.Repository.Entities.ToList();
             var xx = aaa.Where(r => r.Type == tcc.Models.EEntityType.CLASS).ToList();
