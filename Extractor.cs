@@ -65,10 +65,12 @@ namespace tcc
 				if (baseList == null) continue;
 
 				foreach(var baseItem in baseList) {
-					Console.WriteLine("Inherits from:" + baseItem.Type.ToString());
+					Console.WriteLine("INHERITANCE: " + classDeclaration.Identifier + " -> " + baseItem.Type.ToString());
 				}
 
 				this.ExtractInstantiations(classDeclaration, semanticModel);
+				this.ExtractAssociationsViaParameter(classDeclaration, semanticModel);
+				this.ExtractConstructorCompositions(classDeclaration, semanticModel);
 			}
 		}
 
@@ -82,8 +84,36 @@ namespace tcc
 				var typeInfo = semanticModel.GetTypeInfo(objCreation);
 
                 Console.WriteLine(
-					"Obj creation in class: " + classDeclaration.Identifier + " class: " + typeInfo.Type);
+					"INSTANTIATION: " + classDeclaration.Identifier + " -> " + typeInfo.Type);
             }
+		}
+
+		public void ExtractAssociationsViaParameter(ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
+		{
+			var methods = classDeclaration.DescendantNodes().OfType<MethodDeclarationSyntax>().ToList();
+			foreach(var method in methods)
+			{
+				var parameters = method.ParameterList.Parameters.ToList();
+				foreach(var param in parameters)
+				{
+					Console.WriteLine(
+						"ASSOCIATION: " + classDeclaration.Identifier + " -> " + param.Type + " ON METHOD: " + method.Identifier.Text);
+				}
+			}
+		}
+
+		public void ExtractConstructorCompositions(ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
+		{
+			var constructors = classDeclaration.DescendantNodes().OfType<ConstructorDeclarationSyntax>().ToList();
+			foreach(var constructor in constructors) 
+			{
+				var instantiations = constructor.Body.DescendantNodes().OfType<ObjectCreationExpressionSyntax>().ToList();
+				foreach(var instantiation in instantiations)
+				{
+					var typeInfo = semanticModel.GetTypeInfo(instantiation);
+					Console.WriteLine("COMPOSITION: " + classDeclaration.Identifier + " -> " + typeInfo.Type);
+				}
+			}
 		}
 
 		public void ReadSolution()
