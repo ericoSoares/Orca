@@ -70,7 +70,7 @@ namespace tcc
 
 				this.ExtractInstantiations(classDeclaration, semanticModel);
 				this.ExtractAssociationsViaParameter(classDeclaration, semanticModel);
-				this.ExtractConstructorCompositions(classDeclaration, semanticModel);
+				this.ExtractCompositions(classDeclaration, semanticModel);
 			}
 		}
 
@@ -102,15 +102,38 @@ namespace tcc
 			}
 		}
 
-		public void ExtractConstructorCompositions(ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
+		public void ExtractCompositions(ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
 		{
 			var constructors = classDeclaration.DescendantNodes().OfType<ConstructorDeclarationSyntax>().ToList();
+			var fieldDeclarations = classDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>().ToList();
+			var propertyDeclarations = classDeclaration.DescendantNodes().OfType<PropertyDeclarationSyntax>().ToList();
+
 			foreach(var constructor in constructors) 
 			{
 				var instantiations = constructor.Body.DescendantNodes().OfType<ObjectCreationExpressionSyntax>().ToList();
 				foreach(var instantiation in instantiations)
 				{
 					var typeInfo = semanticModel.GetTypeInfo(instantiation);
+					Console.WriteLine("COMPOSITION: " + classDeclaration.Identifier + " -> " + typeInfo.Type);
+				}
+			}
+
+			foreach(var field in fieldDeclarations)
+			{
+				var objCreation = field.DescendantNodes().OfType<ObjectCreationExpressionSyntax>().FirstOrDefault();
+				if (objCreation != null)
+				{
+					var typeInfo = semanticModel.GetTypeInfo(objCreation);
+					Console.WriteLine("COMPOSITION: " + classDeclaration.Identifier + " -> " + typeInfo.Type);
+				}
+			}
+
+			foreach (var prop in propertyDeclarations)
+			{
+				var objCreation = prop.DescendantNodes().OfType<ObjectCreationExpressionSyntax>().FirstOrDefault();
+				if (objCreation != null)
+				{
+					var typeInfo = semanticModel.GetTypeInfo(objCreation);
 					Console.WriteLine("COMPOSITION: " + classDeclaration.Identifier + " -> " + typeInfo.Type);
 				}
 			}
