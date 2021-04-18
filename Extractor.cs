@@ -61,20 +61,40 @@ namespace tcc
 					Type = Models.EEntityType.CLASS
 				});
 
-				var baseList = classDeclaration.BaseList?.DescendantNodes().OfType<SimpleBaseTypeSyntax>().ToList();
-				if (baseList == null) continue;
-
-				foreach(var baseItem in baseList) {
-					Console.WriteLine("INHERITANCE: " + classDeclaration.Identifier + " -> " + baseItem.Type.ToString());
-				}
-
-				this.ExtractInstantiations(classDeclaration, semanticModel);
-				this.ExtractAssociationsViaParameter(classDeclaration, semanticModel);
-				this.ExtractCompositions(classDeclaration, semanticModel);
+				this.ExtractInheritances(classDeclaration, typeSymbol, semanticModel);
+				this.ExtractInstantiations(classDeclaration, typeSymbol, semanticModel);
+				this.ExtractAssociationsViaParameter(classDeclaration, typeSymbol, semanticModel);
+				this.ExtractCompositions(classDeclaration, typeSymbol, semanticModel);
 			}
 		}
 
-		public void ExtractInstantiations(ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
+		public void ExtractInheritances(
+			ClassDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
+		{
+			//var baseList = classDeclaration.BaseList?.DescendantNodes().OfType<SimpleBaseTypeSyntax>().ToList();
+
+			//if (baseList == null) return;
+
+			//foreach (var baseItem in baseList)
+			//{
+			//	var baseItemNode = baseItem.DescendantNodes().FirstOrDefault();
+			//	if (baseItemNode == null) continue;
+			//	var typeInfo = semanticModel.GetTypeInfo(baseItemNode);
+				
+			//}
+			var baseType = curClassTypeSymbol.BaseType;
+			while(baseType != null)
+			{
+				if (baseType.Name != "Object")
+				{
+					Console.WriteLine("INHERITANCE: " + curClassTypeSymbol.ToDisplayString() + " -> " + baseType.Name);
+				} 
+				baseType = baseType.BaseType;
+			}
+		}
+
+		public void ExtractInstantiations(
+			ClassDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
 		{
 			var objCreations = classDeclaration
 				.DescendantNodes().OfType<ObjectCreationExpressionSyntax>().ToList();
@@ -84,11 +104,12 @@ namespace tcc
 				var typeInfo = semanticModel.GetTypeInfo(objCreation);
 
                 Console.WriteLine(
-					"INSTANTIATION: " + classDeclaration.Identifier + " -> " + typeInfo.Type);
+					"INSTANTIATION: " + curClassTypeSymbol.ToDisplayString() + " -> " + typeInfo.Type);
             }
 		}
 
-		public void ExtractAssociationsViaParameter(ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
+		public void ExtractAssociationsViaParameter(
+			ClassDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
 		{
 			var methods = classDeclaration.DescendantNodes().OfType<MethodDeclarationSyntax>().ToList();
 			foreach(var method in methods)
@@ -96,13 +117,16 @@ namespace tcc
 				var parameters = method.ParameterList.Parameters.ToList();
 				foreach(var param in parameters)
 				{
+					var porra = param.DescendantNodes().ToList();
+					var typeInfo = semanticModel.GetTypeInfo(param);
 					Console.WriteLine(
-						"ASSOCIATION: " + classDeclaration.Identifier + " -> " + param.Type + " ON METHOD: " + method.Identifier.Text);
+						"ASSOCIATION: " + curClassTypeSymbol.ToDisplayString() + " -> " + param.Type + " ON METHOD: " + method.Identifier.Text);
 				}
 			}
 		}
 
-		public void ExtractCompositions(ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
+		public void ExtractCompositions(
+			ClassDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
 		{
 			var constructors = classDeclaration.DescendantNodes().OfType<ConstructorDeclarationSyntax>().ToList();
 			var fieldDeclarations = classDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>().ToList();
@@ -114,7 +138,7 @@ namespace tcc
 				foreach(var instantiation in instantiations)
 				{
 					var typeInfo = semanticModel.GetTypeInfo(instantiation);
-					Console.WriteLine("COMPOSITION: " + classDeclaration.Identifier + " -> " + typeInfo.Type);
+					Console.WriteLine("COMPOSITION: " + curClassTypeSymbol.ToDisplayString() + " -> " + typeInfo.Type);
 				}
 			}
 
@@ -124,7 +148,7 @@ namespace tcc
 				if (objCreation != null)
 				{
 					var typeInfo = semanticModel.GetTypeInfo(objCreation);
-					Console.WriteLine("COMPOSITION: " + classDeclaration.Identifier + " -> " + typeInfo.Type);
+					Console.WriteLine("COMPOSITION: " + curClassTypeSymbol.ToDisplayString() + " -> " + typeInfo.Type);
 				}
 			}
 
@@ -134,7 +158,7 @@ namespace tcc
 				if (objCreation != null)
 				{
 					var typeInfo = semanticModel.GetTypeInfo(objCreation);
-					Console.WriteLine("COMPOSITION: " + classDeclaration.Identifier + " -> " + typeInfo.Type);
+					Console.WriteLine("COMPOSITION: " + curClassTypeSymbol.ToDisplayString() + " -> " + typeInfo.Type);
 				}
 			}
 		}
