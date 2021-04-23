@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,5 +14,7 @@ namespace tcc.Models
         public string AccessModifier { get; set; }
         public string SemanticType { get; set; }
         public int LineNumber { get; set; }
+        public TypeDeclarationSyntax TypeDeclaration { get; set; }
+        public SyntaxTree SyntaxTree { get; set; }
     }
 }

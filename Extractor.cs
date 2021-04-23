@@ -22,74 +22,95 @@ namespace tcc
 			this.Repository = new Repository();
         }
 
-		public void ExtractEntities(SyntaxTree tree)
+		public void ExtractEntities(Compilation compilation)
 		{
-			var root = tree.GetRoot();
-			var interfaceDeclarations = root.DescendantNodes().OfType<InterfaceDeclarationSyntax>();
-			var classDeclarations = root.DescendantNodes().OfType<ClassDeclarationSyntax>();
-
-			var compilation = CSharpCompilation.Create("compilation")
-				.AddReferences(
-					MetadataReference.CreateFromFile(
-					typeof(object).Assembly.Location))
-				.AddSyntaxTrees(tree);
-
-			var semanticModel = compilation.GetSemanticModel(tree);
-
-			foreach (var interfaceDeclaration in interfaceDeclarations)
+			foreach (var syntaxTree in compilation.SyntaxTrees)
 			{
-				var typeSymbol = semanticModel.GetDeclaredSymbol(interfaceDeclaration);
-				this.Repository.Entities.Add(new Models.Entity()
+				var root = syntaxTree.GetRoot();
+				var interfaceDeclarations = root.DescendantNodes().OfType<InterfaceDeclarationSyntax>().ToList();
+				var classDeclarations = root.DescendantNodes().OfType<ClassDeclarationSyntax>().ToList();
+
+				var semanticModel = compilation.GetSemanticModel(syntaxTree);
+
+				foreach (var interfaceDeclaration in interfaceDeclarations)
 				{
-					Name = interfaceDeclaration.Identifier.ValueText,
-					SemanticType = typeSymbol.ToString(),
-					LineNumber = interfaceDeclaration.SpanStart,
-					AccessModifier = interfaceDeclaration.Modifiers.ToString(),
-					Type = Models.EEntityType.INTERFACE
-				});
+					var typeSymbol = semanticModel.GetDeclaredSymbol(interfaceDeclaration);
+					this.Repository.Entities.Add(new Models.Entity()
+					{
+						Name = interfaceDeclaration.Identifier.ValueText,
+						SemanticType = typeSymbol.ToString(),
+						LineNumber = interfaceDeclaration.SpanStart,
+						AccessModifier = interfaceDeclaration.Modifiers.ToString(),
+						Type = Models.EEntityType.INTERFACE,
+						SyntaxTree = syntaxTree,
+						TypeDeclaration = interfaceDeclaration
+					});
+				}
+
+				foreach (var classDeclaration in classDeclarations)
+				{
+					var typeSymbol = semanticModel.GetDeclaredSymbol(classDeclaration);
+					this.Repository.Entities.Add(new Models.Entity()
+					{
+						Name = classDeclaration.Identifier.ValueText,
+						SemanticType = typeSymbol.ToString(),
+						LineNumber = classDeclaration.SpanStart,
+						AccessModifier = classDeclaration.Modifiers.ToString(),
+						Type = Models.EEntityType.CLASS,
+						SyntaxTree = syntaxTree,
+						TypeDeclaration = classDeclaration
+					});
+				}
 			}
+		}
 
-			foreach (var classDeclaration in classDeclarations)
+		public void ExtractRelatioships(Compilation compilation)
+		{
+			foreach (var entity in this.Repository.Entities.Where(r => r.Type == Models.EEntityType.CLASS))
 			{
-				var typeSymbol = semanticModel.GetDeclaredSymbol(classDeclaration);
-				this.Repository.Entities.Add(new Models.Entity()
-				{
-					Name = classDeclaration.Identifier.ValueText,
-					SemanticType = typeSymbol.ToString(),
-					LineNumber = classDeclaration.SpanStart,
-					AccessModifier = classDeclaration.Modifiers.ToString(),
-					Type = Models.EEntityType.CLASS
-				});
+				var semanticModel = compilation.GetSemanticModel(entity.SyntaxTree);
+				var typeSymbol = semanticModel.GetDeclaredSymbol(entity.TypeDeclaration);
 
-				this.ExtractInheritances(classDeclaration, typeSymbol, semanticModel);
-				this.ExtractInstantiations(classDeclaration, typeSymbol, semanticModel);
-				this.ExtractAssociationsViaParameter(classDeclaration, typeSymbol, semanticModel);
-				this.ExtractCompositions(classDeclaration, typeSymbol, semanticModel);
+				this.ExtractInheritances(entity.TypeDeclaration, typeSymbol, semanticModel);
+				//this.ExtractInstantiations(classDeclaration, typeSymbol, semanticModel);
+				//this.ExtractImplementations(classDeclaration, typeSymbol, semanticModel);
+				//this.ExtractReceptionsViaParameter(classDeclaration, typeSymbol, semanticModel);
+				//this.ExtractCompositions(classDeclaration, typeSymbol, semanticModel);
+				//this.ExtractInheritances(classDeclaration, typeSymbol, semanticModel);
+				//this.ExtractImplementations(classDeclaration, typeSymbol, semanticModel);
+				//this.ExtractInstantiaions(classDeclaration, typeSymbol, semanticModel);
+				//this.ExtractReceptionsOnMethod(classDeclaration, typeSymbol, semanticModel);
+				//this.ExtractReceptionsOnConstructor(classDeclaration, typeSymbol, semanticModel);
 			}
 		}
 
 		public void ExtractInheritances(
-			ClassDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
+			TypeDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
 		{
-			//var baseList = classDeclaration.BaseList?.DescendantNodes().OfType<SimpleBaseTypeSyntax>().ToList();
-
-			//if (baseList == null) return;
-
-			//foreach (var baseItem in baseList)
-			//{
-			//	var baseItemNode = baseItem.DescendantNodes().FirstOrDefault();
-			//	if (baseItemNode == null) continue;
-			//	var typeInfo = semanticModel.GetTypeInfo(baseItemNode);
-				
-			//}
 			var baseType = curClassTypeSymbol.BaseType;
 			while(baseType != null)
 			{
 				if (baseType.Name != "Object")
 				{
-					Console.WriteLine("INHERITANCE: " + curClassTypeSymbol.ToDisplayString() + " -> " + baseType.Name);
+					this.Repository.AddRelationship(
+						Models.ERelationshipType.INHERITANCE, curClassTypeSymbol.ToString(), baseType.ToString(), classDeclaration.SpanStart);
+
+					Console.WriteLine("INHERITANCE: " + curClassTypeSymbol.ToDisplayString() + " -> " + baseType.ToString());
 				} 
 				baseType = baseType.BaseType;
+			}
+		}
+
+		public void ExtractImplementations(
+			ClassDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
+		{
+			var interfaces = curClassTypeSymbol.AllInterfaces;
+			foreach(var curInterface in interfaces)
+			{
+				this.Repository.AddRelationship(
+					Models.ERelationshipType.IMPLEMENTATION, curClassTypeSymbol.ToString(), curInterface.ToString(), classDeclaration.SpanStart);
+
+				Console.WriteLine("IMPLEMENTATION: " + curClassTypeSymbol.ToDisplayString() + " -> " + curInterface.ToString());
 			}
 		}
 
@@ -103,12 +124,19 @@ namespace tcc
             {
 				var typeInfo = semanticModel.GetTypeInfo(objCreation);
 
-                Console.WriteLine(
+				this.Repository.Relationships.Add(new Models.Relationship()
+				{
+					LineNumber = classDeclaration.SpanStart,
+					Source = this.Repository.Entities.FirstOrDefault(r => r.SemanticType == curClassTypeSymbol.ToString()),
+					Target = this.Repository.Entities.FirstOrDefault(r => r.SemanticType == typeInfo.Type.ToString()),
+					Type = Models.ERelationshipType.INSTANTIATION_ON_CREATION
+				});
+				Console.WriteLine(
 					"INSTANTIATION: " + curClassTypeSymbol.ToDisplayString() + " -> " + typeInfo.Type);
             }
 		}
 
-		public void ExtractAssociationsViaParameter(
+		public void ExtractReceptionsViaParameter(
 			ClassDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
 		{
 			var methods = classDeclaration.DescendantNodes().OfType<MethodDeclarationSyntax>().ToList();
@@ -119,6 +147,13 @@ namespace tcc
 				{
 					var porra = param.DescendantNodes().ToList();
 					var typeInfo = semanticModel.GetTypeInfo(param);
+					this.Repository.Relationships.Add(new Models.Relationship()
+					{
+						LineNumber = classDeclaration.SpanStart,
+						Source = this.Repository.Entities.FirstOrDefault(r => r.SemanticType == curClassTypeSymbol.ToString()),
+						Target = this.Repository.Entities.FirstOrDefault(r => r.SemanticType == typeInfo.Type.ToString()),
+						Type = Models.ERelationshipType.INSTANTIATION_ON_CREATION
+					});
 					Console.WriteLine(
 						"ASSOCIATION: " + curClassTypeSymbol.ToDisplayString() + " -> " + param.Type + " ON METHOD: " + method.Identifier.Text);
 				}
@@ -166,6 +201,12 @@ namespace tcc
 		public void ReadSolution()
         {
 			MSBuildLocator.RegisterMSBuildPath("C:\\Program Files\\dotnet\\sdk\\3.1.101");
+			var partialCompilation = CSharpCompilation.Create("compilation")
+				.AddReferences(
+					MetadataReference.CreateFromFile(
+					typeof(object).Assembly.Location));
+
+			List<SyntaxTree> trees = new List<SyntaxTree>();
 			using (var workspace = MSBuildWorkspace.Create())
 			{
 				// Read solution from specified path
@@ -175,13 +216,19 @@ namespace tcc
 				foreach (var proj in solution.Projects)
 				{
 					Console.WriteLine("Project: " + proj.Name);
-
+					var excluded = new List<string>() { "ComponentTests", "IntegrationTests", "UnitTests" };
+					if (excluded.Contains(proj.Name)) continue;
 					foreach (var doc in proj.Documents)
 					{
-						this.ExtractEntities(doc.GetSyntaxTreeAsync().Result);
+						trees.Add(doc.GetSyntaxTreeAsync().Result);
 					}
 				}
 			}
+
+			var compilation = (Compilation)partialCompilation.AddSyntaxTrees(trees);
+
+			this.ExtractEntities(compilation);
+			this.ExtractRelatioships(compilation);
 		}
 
     }
