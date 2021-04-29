@@ -64,23 +64,23 @@ namespace tcc
 			}
 		}
 
-		public void ExtractRelatioships(Compilation compilation)
+		public void ExtractRelationships(Compilation compilation)
 		{
 			foreach (var entity in this.Repository.Entities.Where(r => r.Type == Models.EEntityType.CLASS))
 			{
 				var semanticModel = compilation.GetSemanticModel(entity.SyntaxTree);
 				var typeSymbol = semanticModel.GetDeclaredSymbol(entity.TypeDeclaration);
 
-				this.ExtractInheritances(entity.TypeDeclaration, typeSymbol, semanticModel);
-				//this.ExtractInstantiations(classDeclaration, typeSymbol, semanticModel);
-				//this.ExtractImplementations(classDeclaration, typeSymbol, semanticModel);
-				//this.ExtractReceptionsViaParameter(classDeclaration, typeSymbol, semanticModel);
-				//this.ExtractCompositions(classDeclaration, typeSymbol, semanticModel);
-				//this.ExtractInheritances(classDeclaration, typeSymbol, semanticModel);
-				//this.ExtractImplementations(classDeclaration, typeSymbol, semanticModel);
-				//this.ExtractInstantiaions(classDeclaration, typeSymbol, semanticModel);
-				//this.ExtractReceptionsOnMethod(classDeclaration, typeSymbol, semanticModel);
-				//this.ExtractReceptionsOnConstructor(classDeclaration, typeSymbol, semanticModel);
+				//this.ExtractInheritances(entity.TypeDeclaration, typeSymbol, semanticModel);
+				//this.ExtractImplementations(entity.TypeDeclaration, typeSymbol, semanticModel);
+				this.ExtractInstantiations(entity.TypeDeclaration, typeSymbol, semanticModel);
+				//this.ExtractReceptionsViaParameter(entity.TypeDeclaration, typeSymbol, semanticModel);
+				//this.ExtractCompositions(entity.TypeDeclaration, typeSymbol, semanticModel);
+				//this.ExtractInheritances(entity.TypeDeclaration, typeSymbol, semanticModel);
+				//this.ExtractImplementations(entity.TypeDeclaration, typeSymbol, semanticModel);
+				//this.ExtractInstantiaions(entity.TypeDeclaration, typeSymbol, semanticModel);
+				//this.ExtractReceptionsOnMethod(entity.TypeDeclaration, typeSymbol, semanticModel);
+				//this.ExtractReceptionsOnConstructor(entity.TypeDeclaration, typeSymbol, semanticModel);
 			}
 		}
 
@@ -102,7 +102,7 @@ namespace tcc
 		}
 
 		public void ExtractImplementations(
-			ClassDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
+			TypeDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
 		{
 			var interfaces = curClassTypeSymbol.AllInterfaces;
 			foreach(var curInterface in interfaces)
@@ -115,7 +115,7 @@ namespace tcc
 		}
 
 		public void ExtractInstantiations(
-			ClassDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
+			TypeDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
 		{
 			var objCreations = classDeclaration
 				.DescendantNodes().OfType<ObjectCreationExpressionSyntax>().ToList();
@@ -124,20 +124,43 @@ namespace tcc
             {
 				var typeInfo = semanticModel.GetTypeInfo(objCreation);
 
-				this.Repository.Relationships.Add(new Models.Relationship()
+				// Busca nodos pais do nodo atual
+				var ancestors = objCreation.Ancestors().ToList();
+
+				// Busca nodo de declaração de construtor ou metodo
+				var ancestorConstructor = ancestors.OfType<ConstructorDeclarationSyntax>().FirstOrDefault();
+				var ancestorMethod = ancestors.OfType<MethodDeclarationSyntax>().FirstOrDefault();
+
+				// Define tipo e nome do método caso a instanciação seja dentro de um construtor ou metodo
+				var type = Models.ERelationshipType.INSTANTIATION_IN_CLASS;
+				var methodName = "";
+				if (ancestorConstructor != null)
 				{
-					LineNumber = classDeclaration.SpanStart,
-					Source = this.Repository.Entities.FirstOrDefault(r => r.SemanticType == curClassTypeSymbol.ToString()),
-					Target = this.Repository.Entities.FirstOrDefault(r => r.SemanticType == typeInfo.Type.ToString()),
-					Type = Models.ERelationshipType.INSTANTIATION_ON_CREATION
-				});
+					type = Models.ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR;
+					methodName = "ctor";
+				}
+
+				if (ancestorMethod != null)
+				{
+					type = Models.ERelationshipType.INSTANTIATION_IN_METHOD;
+					methodName = ancestorMethod.Identifier.ToString();
+				}
+
+				this.Repository.AddRelationship(
+					type, 
+					curClassTypeSymbol.ToString(), 
+					typeInfo.Type.ToString(), 
+					classDeclaration.SpanStart,
+					methodName,
+					(type == Models.ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR));
+
 				Console.WriteLine(
 					"INSTANTIATION: " + curClassTypeSymbol.ToDisplayString() + " -> " + typeInfo.Type);
             }
 		}
 
 		public void ExtractReceptionsViaParameter(
-			ClassDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
+			TypeDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
 		{
 			var methods = classDeclaration.DescendantNodes().OfType<MethodDeclarationSyntax>().ToList();
 			foreach(var method in methods)
@@ -152,7 +175,7 @@ namespace tcc
 						LineNumber = classDeclaration.SpanStart,
 						Source = this.Repository.Entities.FirstOrDefault(r => r.SemanticType == curClassTypeSymbol.ToString()),
 						Target = this.Repository.Entities.FirstOrDefault(r => r.SemanticType == typeInfo.Type.ToString()),
-						Type = Models.ERelationshipType.INSTANTIATION_ON_CREATION
+						Type = Models.ERelationshipType.RECEPTION_ON_METHOD
 					});
 					Console.WriteLine(
 						"ASSOCIATION: " + curClassTypeSymbol.ToDisplayString() + " -> " + param.Type + " ON METHOD: " + method.Identifier.Text);
@@ -161,7 +184,7 @@ namespace tcc
 		}
 
 		public void ExtractCompositions(
-			ClassDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
+			TypeDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
 		{
 			var constructors = classDeclaration.DescendantNodes().OfType<ConstructorDeclarationSyntax>().ToList();
 			var fieldDeclarations = classDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>().ToList();
@@ -217,7 +240,9 @@ namespace tcc
 				{
 					Console.WriteLine("Project: " + proj.Name);
 					var excluded = new List<string>() { "ComponentTests", "IntegrationTests", "UnitTests" };
+
 					if (excluded.Contains(proj.Name)) continue;
+
 					foreach (var doc in proj.Documents)
 					{
 						trees.Add(doc.GetSyntaxTreeAsync().Result);
@@ -228,7 +253,7 @@ namespace tcc
 			var compilation = (Compilation)partialCompilation.AddSyntaxTrees(trees);
 
 			this.ExtractEntities(compilation);
-			this.ExtractRelatioships(compilation);
+			this.ExtractRelationships(compilation);
 		}
 
     }

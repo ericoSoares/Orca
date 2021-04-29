@@ -18,7 +18,8 @@ namespace tcc
             this.Relationships = new List<Relationship>();
         }
 
-        public void AddRelationship(ERelationshipType type, string sourceType, string targetType, int lineNumber)
+        public void AddRelationship(
+            ERelationshipType type, string sourceType, string targetType, int lineNumber, string methodName = "", bool isMethodConstructor = false)
         {
             var foundSource = this.Entities.FirstOrDefault(r => r.SemanticType == sourceType);
             var foundTarget = this.Entities.FirstOrDefault(r => r.SemanticType == targetType);
@@ -29,7 +30,9 @@ namespace tcc
                 LineNumber = lineNumber,
                 Source = foundSource,
                 Target = foundTarget,
-                Type = type
+                Type = type,
+                IsMethodConstructor = isMethodConstructor,
+                MethodName = methodName
             });
         }
     }
