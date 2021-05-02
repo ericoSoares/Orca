@@ -16,12 +16,12 @@ namespace SemanticQuickStart
             var project1 = @"C:\Users\erico\source\repos\clean-architecture-manga\Clean-Architecture-Manga.sln";
             var project2 = @"C:\Users\erico\source\repos\TestProject\TestProject.sln";
             var extractor = new Extractor(project2);
-            extractor.ReadSolution();
-            var aaa = extractor.Repository.Entities.ToList();
-            var sss = extractor.Repository.Relationships.ToList();
-            var xx = aaa.Where(r => r.Type == tcc.Models.EEntityType.CLASS).ToList();
-            var xxx = aaa.Where(r => r.Type == tcc.Models.EEntityType.INTERFACE).ToList();
-            var x = 1;
+            extractor.Run();
+            extractor.Repository.PrintStatus();
+            foreach(var relationship in extractor.Repository.Relationships)
+            {
+                Console.WriteLine(relationship.ToString());
+            }
         }
     }
 }

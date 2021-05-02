@@ -18,12 +18,12 @@ namespace tcc
             this.Relationships = new List<Relationship>();
         }
 
-        public void AddRelationship(
+        public bool AddRelationship(
             ERelationshipType type, string sourceType, string targetType, int lineNumber, string methodName = "", bool isMethodConstructor = false)
         {
             var foundSource = this.Entities.FirstOrDefault(r => r.SemanticType == sourceType);
             var foundTarget = this.Entities.FirstOrDefault(r => r.SemanticType == targetType);
-            if (foundTarget == null || foundSource == null) return;
+            if (foundTarget == null || foundSource == null) return false;
 
             this.Relationships.Add(new Relationship()
             {
@@ -34,6 +34,14 @@ namespace tcc
                 IsMethodConstructor = isMethodConstructor,
                 MethodName = methodName
             });
+
+            return true;
+        }
+
+        public void PrintStatus()
+        {
+            Console.WriteLine("Total entities: " + this.Entities.Count);
+            Console.WriteLine("Total relationships: " + this.Relationships.Count);
         }
     }
 }

@@ -71,11 +71,11 @@ namespace tcc
 				var semanticModel = compilation.GetSemanticModel(entity.SyntaxTree);
 				var typeSymbol = semanticModel.GetDeclaredSymbol(entity.TypeDeclaration);
 
-				//this.ExtractInheritances(entity.TypeDeclaration, typeSymbol, semanticModel);
-				//this.ExtractImplementations(entity.TypeDeclaration, typeSymbol, semanticModel);
-				//this.ExtractInstantiations(entity.TypeDeclaration, typeSymbol, semanticModel);
-				//this.ExtractReceptions(entity.TypeDeclaration, typeSymbol, semanticModel);
+				this.ExtractInheritances(entity.TypeDeclaration, typeSymbol, semanticModel);
+				this.ExtractImplementations(entity.TypeDeclaration, typeSymbol, semanticModel);
+				this.ExtractInstantiations(entity.TypeDeclaration, typeSymbol, semanticModel);
 				this.ExtractDependencies(entity.TypeDeclaration, typeSymbol, semanticModel);
+				this.ExtractReceptions(entity.TypeDeclaration, typeSymbol, semanticModel);
 			}
 		}
 
@@ -90,8 +90,6 @@ namespace tcc
 					this.Repository.AddRelationship(
 						Models.ERelationshipType.INHERITANCE, curClassTypeSymbol.ToString(), baseType.ToString(),
 						classDeclaration.GetLocation().GetMappedLineSpan().StartLinePosition.Line);
-
-					Console.WriteLine("INHERITANCE: " + curClassTypeSymbol.ToDisplayString() + " -> " + baseType.ToString());
 				} 
 				baseType = baseType.BaseType;
 			}
@@ -106,8 +104,6 @@ namespace tcc
 				this.Repository.AddRelationship(
 					Models.ERelationshipType.IMPLEMENTATION, curClassTypeSymbol.ToString(), curInterface.ToString(), 
 					classDeclaration.GetLocation().GetMappedLineSpan().StartLinePosition.Line);
-
-				Console.WriteLine("IMPLEMENTATION: " + curClassTypeSymbol.ToDisplayString() + " -> " + curInterface.ToString());
 			}
 		}
 
@@ -151,8 +147,6 @@ namespace tcc
 					methodName,
 					(type == Models.ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR));
 
-				Console.WriteLine(
-					"INSTANTIATION: " + curClassTypeSymbol.ToDisplayString() + " -> " + typeInfo.Type);
             }
 		}
 
@@ -176,8 +170,6 @@ namespace tcc
 						param.GetLocation().GetMappedLineSpan().StartLinePosition.Line,
 						method.Identifier.ToString());
 					
-					Console.WriteLine(
-						"RECEPTION: " + curClassTypeSymbol.ToDisplayString() + " -> " + declaredSymbol.Type.ToString() + " ON METHOD: " + method.Identifier.Text);
 				}
 			}
 
@@ -194,9 +186,6 @@ namespace tcc
 						declaredSymbol.Type.ToString(),
 						classDeclaration.SpanStart,
 						"ctor", true);
-
-					Console.WriteLine(
-						"RECEPTION: " + curClassTypeSymbol.ToDisplayString() + " -> " + declaredSymbol.Type.ToString() + " ON CTOR: " + ctor.Identifier.Text);
 				}
 			}
 		}
@@ -214,7 +203,6 @@ namespace tcc
 				foreach(var instantiation in instantiations)
 				{
 					var typeInfo = semanticModel.GetTypeInfo(instantiation);
-					Console.WriteLine("COMPOSITION: " + curClassTypeSymbol.ToDisplayString() + " -> " + typeInfo.Type);
 				}
 			}
 
@@ -224,7 +212,6 @@ namespace tcc
 				if (objCreation != null)
 				{
 					var typeInfo = semanticModel.GetTypeInfo(objCreation);
-					Console.WriteLine("COMPOSITION: " + curClassTypeSymbol.ToDisplayString() + " -> " + typeInfo.Type);
 				}
 			}
 
@@ -234,7 +221,6 @@ namespace tcc
 				if (objCreation != null)
 				{
 					var typeInfo = semanticModel.GetTypeInfo(objCreation);
-					Console.WriteLine("COMPOSITION: " + curClassTypeSymbol.ToDisplayString() + " -> " + typeInfo.Type);
 				}
 			}
 		}
@@ -254,8 +240,6 @@ namespace tcc
 					type.ToString(),
 					prop.GetLocation().GetMappedLineSpan().StartLinePosition.Line);
 
-				Console.WriteLine(
-					"DEPENDENCY (PROP): " + curClassTypeSymbol.ToDisplayString() + " -> " + type.ToString() + " PROP NAME: " + prop.Identifier.ToString());
 			}
 
 			foreach(var field in fields)
@@ -268,17 +252,11 @@ namespace tcc
 					curClassTypeSymbol.ToString(),
 					type,
 					field.GetLocation().GetMappedLineSpan().StartLinePosition.Line);
-
-				Console.WriteLine(
-					"DEPENDENCY (FIELD): " 
-					+ curClassTypeSymbol.ToDisplayString() 
-					+ " -> " + type + " FIELD NAMES: " 
-					+ string.Join(", ", field.Declaration.Variables.Select(r => r.Identifier.ToString()).ToList()));
 			}
 
 		}
 
-		public void ReadSolution()
+		public void Run()
         {
 			MSBuildLocator.RegisterMSBuildPath("C:\\Program Files\\dotnet\\sdk\\3.1.101");
 			var partialCompilation = CSharpCompilation.Create("compilation")
@@ -312,6 +290,5 @@ namespace tcc
 			this.ExtractEntities(compilation);
 			this.ExtractRelationships(compilation);
 		}
-
     }
 }

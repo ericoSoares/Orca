@@ -13,5 +13,11 @@ namespace tcc.Models
         public int LineNumber { get; set; }
         public string MethodName { get; set; }
         public bool IsMethodConstructor { get; set; }
+
+        public override string ToString()
+        {
+            var baseString = Enum.GetName(typeof(ERelationshipType), Type) + ": " + Source.SemanticType + " -> " + Target.SemanticType + " LINE: " + LineNumber;
+            return baseString;
+        }
     }
 }
