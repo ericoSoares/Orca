@@ -73,14 +73,9 @@ namespace tcc
 
 				//this.ExtractInheritances(entity.TypeDeclaration, typeSymbol, semanticModel);
 				//this.ExtractImplementations(entity.TypeDeclaration, typeSymbol, semanticModel);
-				this.ExtractInstantiations(entity.TypeDeclaration, typeSymbol, semanticModel);
-				//this.ExtractReceptionsViaParameter(entity.TypeDeclaration, typeSymbol, semanticModel);
-				//this.ExtractCompositions(entity.TypeDeclaration, typeSymbol, semanticModel);
-				//this.ExtractInheritances(entity.TypeDeclaration, typeSymbol, semanticModel);
-				//this.ExtractImplementations(entity.TypeDeclaration, typeSymbol, semanticModel);
-				//this.ExtractInstantiaions(entity.TypeDeclaration, typeSymbol, semanticModel);
-				//this.ExtractReceptionsOnMethod(entity.TypeDeclaration, typeSymbol, semanticModel);
-				//this.ExtractReceptionsOnConstructor(entity.TypeDeclaration, typeSymbol, semanticModel);
+				//this.ExtractInstantiations(entity.TypeDeclaration, typeSymbol, semanticModel);
+				//this.ExtractReceptions(entity.TypeDeclaration, typeSymbol, semanticModel);
+				this.ExtractDependencies(entity.TypeDeclaration, typeSymbol, semanticModel);
 			}
 		}
 
@@ -93,7 +88,8 @@ namespace tcc
 				if (baseType.Name != "Object")
 				{
 					this.Repository.AddRelationship(
-						Models.ERelationshipType.INHERITANCE, curClassTypeSymbol.ToString(), baseType.ToString(), classDeclaration.SpanStart);
+						Models.ERelationshipType.INHERITANCE, curClassTypeSymbol.ToString(), baseType.ToString(),
+						classDeclaration.GetLocation().GetMappedLineSpan().StartLinePosition.Line);
 
 					Console.WriteLine("INHERITANCE: " + curClassTypeSymbol.ToDisplayString() + " -> " + baseType.ToString());
 				} 
@@ -108,7 +104,8 @@ namespace tcc
 			foreach(var curInterface in interfaces)
 			{
 				this.Repository.AddRelationship(
-					Models.ERelationshipType.IMPLEMENTATION, curClassTypeSymbol.ToString(), curInterface.ToString(), classDeclaration.SpanStart);
+					Models.ERelationshipType.IMPLEMENTATION, curClassTypeSymbol.ToString(), curInterface.ToString(), 
+					classDeclaration.GetLocation().GetMappedLineSpan().StartLinePosition.Line);
 
 				Console.WriteLine("IMPLEMENTATION: " + curClassTypeSymbol.ToDisplayString() + " -> " + curInterface.ToString());
 			}
@@ -149,8 +146,8 @@ namespace tcc
 				this.Repository.AddRelationship(
 					type, 
 					curClassTypeSymbol.ToString(), 
-					typeInfo.Type.ToString(), 
-					classDeclaration.SpanStart,
+					typeInfo.Type.ToString(),
+					objCreation.GetLocation().GetMappedLineSpan().StartLinePosition.Line,
 					methodName,
 					(type == Models.ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR));
 
@@ -159,26 +156,47 @@ namespace tcc
             }
 		}
 
-		public void ExtractReceptionsViaParameter(
+		// TODO: Tratar caso de object initializers
+		public void ExtractReceptions(
 			TypeDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
 		{
 			var methods = classDeclaration.DescendantNodes().OfType<MethodDeclarationSyntax>().ToList();
+			var ctors = classDeclaration.DescendantNodes().OfType<ConstructorDeclarationSyntax>().ToList();
 			foreach(var method in methods)
 			{
 				var parameters = method.ParameterList.Parameters.ToList();
 				foreach(var param in parameters)
 				{
-					var porra = param.DescendantNodes().ToList();
-					var typeInfo = semanticModel.GetTypeInfo(param);
-					this.Repository.Relationships.Add(new Models.Relationship()
-					{
-						LineNumber = classDeclaration.SpanStart,
-						Source = this.Repository.Entities.FirstOrDefault(r => r.SemanticType == curClassTypeSymbol.ToString()),
-						Target = this.Repository.Entities.FirstOrDefault(r => r.SemanticType == typeInfo.Type.ToString()),
-						Type = Models.ERelationshipType.RECEPTION_ON_METHOD
-					});
+					var declaredSymbol = semanticModel.GetDeclaredSymbol(param);
+					
+					this.Repository.AddRelationship(
+						Models.ERelationshipType.RECEPTION_IN_METHOD,
+						curClassTypeSymbol.ToString(),
+						declaredSymbol.Type.ToString(),
+						param.GetLocation().GetMappedLineSpan().StartLinePosition.Line,
+						method.Identifier.ToString());
+					
 					Console.WriteLine(
-						"ASSOCIATION: " + curClassTypeSymbol.ToDisplayString() + " -> " + param.Type + " ON METHOD: " + method.Identifier.Text);
+						"RECEPTION: " + curClassTypeSymbol.ToDisplayString() + " -> " + declaredSymbol.Type.ToString() + " ON METHOD: " + method.Identifier.Text);
+				}
+			}
+
+			foreach(var ctor in ctors)
+			{
+				var parameters = ctor.ParameterList.Parameters.ToList();
+				foreach(var param in parameters)
+				{
+					var declaredSymbol = semanticModel.GetDeclaredSymbol(param);
+
+					this.Repository.AddRelationship(
+						Models.ERelationshipType.RECEPTION_IN_CONSTRUCTOR,
+						curClassTypeSymbol.ToString(),
+						declaredSymbol.Type.ToString(),
+						classDeclaration.SpanStart,
+						"ctor", true);
+
+					Console.WriteLine(
+						"RECEPTION: " + curClassTypeSymbol.ToDisplayString() + " -> " + declaredSymbol.Type.ToString() + " ON CTOR: " + ctor.Identifier.Text);
 				}
 			}
 		}
@@ -219,6 +237,45 @@ namespace tcc
 					Console.WriteLine("COMPOSITION: " + curClassTypeSymbol.ToDisplayString() + " -> " + typeInfo.Type);
 				}
 			}
+		}
+
+		public void ExtractDependencies(
+			TypeDeclarationSyntax classDeclaration, INamedTypeSymbol curClassTypeSymbol, SemanticModel semanticModel)
+		{
+			var props = classDeclaration.DescendantNodes().OfType<PropertyDeclarationSyntax>().ToList();
+			var fields = classDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>().ToList();
+			foreach(var prop in props)
+			{
+				var declaredSymbol = semanticModel.GetDeclaredSymbol(prop);
+				var type = declaredSymbol.Type;
+				this.Repository.AddRelationship(
+					Models.ERelationshipType.DEPENDENCY,
+					curClassTypeSymbol.ToString(),
+					type.ToString(),
+					prop.GetLocation().GetMappedLineSpan().StartLinePosition.Line);
+
+				Console.WriteLine(
+					"DEPENDENCY (PROP): " + curClassTypeSymbol.ToDisplayString() + " -> " + type.ToString() + " PROP NAME: " + prop.Identifier.ToString());
+			}
+
+			foreach(var field in fields)
+			{
+				var typeSymbol = semanticModel.GetTypeInfo(field.Declaration.Type);
+				var type = typeSymbol.Type.ToString();
+
+				this.Repository.AddRelationship(
+					Models.ERelationshipType.DEPENDENCY,
+					curClassTypeSymbol.ToString(),
+					type,
+					field.GetLocation().GetMappedLineSpan().StartLinePosition.Line);
+
+				Console.WriteLine(
+					"DEPENDENCY (FIELD): " 
+					+ curClassTypeSymbol.ToDisplayString() 
+					+ " -> " + type + " FIELD NAMES: " 
+					+ string.Join(", ", field.Declaration.Variables.Select(r => r.Identifier.ToString()).ToList()));
+			}
+
 		}
 
 		public void ReadSolution()
