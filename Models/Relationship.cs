@@ -13,7 +13,14 @@ namespace tcc.Models
         public int LineNumber { get; set; }
         public string MethodName { get; set; }
         public bool IsMethodConstructor { get; set; }
-
+        public string FileName
+        {
+            get
+            {
+                if (Source.SyntaxTree == null) return "";
+                return Source.SyntaxTree.FilePath;
+            }
+        }
         public override string ToString()
         {
             var baseString = Enum.GetName(typeof(ERelationshipType), Type) + ": " + Source.SemanticType + " -> " + Target.SemanticType + " LINE: " + LineNumber;

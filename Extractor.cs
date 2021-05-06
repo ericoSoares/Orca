@@ -280,7 +280,8 @@ namespace tcc
 
 					foreach (var doc in proj.Documents)
 					{
-						trees.Add(doc.GetSyntaxTreeAsync().Result);
+						var syntaxTree = doc.GetSyntaxTreeAsync().Result;
+						trees.Add(syntaxTree);
 					}
 				}
 			}

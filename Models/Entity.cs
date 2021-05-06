@@ -16,5 +16,13 @@ namespace tcc.Models
         public int LineNumber { get; set; }
         public TypeDeclarationSyntax TypeDeclaration { get; set; }
         public SyntaxTree SyntaxTree { get; set; }
+        public string FileName
+        {
+            get
+            {
+                if (SyntaxTree == null) return "";
+                return SyntaxTree.FilePath;
+            }
+        }
     }
 }

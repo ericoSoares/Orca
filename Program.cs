@@ -15,7 +15,7 @@ namespace SemanticQuickStart
 
             var project1 = @"C:\Users\erico\source\repos\clean-architecture-manga\Clean-Architecture-Manga.sln";
             var project2 = @"C:\Users\erico\source\repos\TestProject\TestProject.sln";
-            var extractor = new Extractor(project2);
+            var extractor = new Extractor(project1);
             extractor.Run();
             extractor.Repository.PrintStatus();
             foreach(var relationship in extractor.Repository.Relationships)
