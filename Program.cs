@@ -15,13 +15,20 @@ namespace SemanticQuickStart
 
             var project1 = @"C:\Users\erico\source\repos\clean-architecture-manga\Clean-Architecture-Manga.sln";
             var project2 = @"C:\Users\erico\source\repos\TestProject\TestProject.sln";
-            var extractor = new Extractor(project1);
+            var extractor = new Extractor(project2);
             extractor.Run();
             extractor.Repository.PrintStatus();
-            foreach(var relationship in extractor.Repository.Relationships)
+
+            var ruleResults = new FactoryRule1(extractor.Repository).Execute();
+            foreach(var ruleResult in ruleResults)
             {
-                Console.WriteLine(relationship.ToString());
+                Console.WriteLine(ruleResult.ToString());
             }
+
+            //foreach(var relationship in extractor.Repository.Relationships)
+            //{
+            //    Console.WriteLine(relationship.ToString());
+            //}
         }
     }
 }

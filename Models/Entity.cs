@@ -13,15 +13,25 @@ namespace tcc.Models
         public EEntityType Type { get; set; }
         public string AccessModifier { get; set; }
         public string SemanticType { get; set; }
-        public int LineNumber { get; set; }
         public TypeDeclarationSyntax TypeDeclaration { get; set; }
         public SyntaxTree SyntaxTree { get; set; }
-        public string FileName
+        public IList<Relationship> SourceRelationships { get; set; }
+        public IList<Relationship> TargetRelationships { get; set; }
+
+        public string FilePath
         {
             get
             {
                 if (SyntaxTree == null) return "";
                 return SyntaxTree.FilePath;
+            }
+        }
+
+        public int LineNumber
+        {
+            get
+            {
+                return this.TypeDeclaration.GetLocation().GetMappedLineSpan().StartLinePosition.Line;
             }
         }
     }

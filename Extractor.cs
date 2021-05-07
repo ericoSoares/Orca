@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.MSBuild;
 using System.Collections.Immutable;
 using Microsoft.Build.Locator;
 using Newtonsoft.Json;
+using tcc.Models;
 
 namespace tcc
 {
@@ -39,11 +40,12 @@ namespace tcc
 					{
 						Name = interfaceDeclaration.Identifier.ValueText,
 						SemanticType = typeSymbol.ToString(),
-						LineNumber = interfaceDeclaration.SpanStart,
 						AccessModifier = interfaceDeclaration.Modifiers.ToString(),
-						Type = Models.EEntityType.INTERFACE,
+						Type = EEntityType.INTERFACE,
 						SyntaxTree = syntaxTree,
-						TypeDeclaration = interfaceDeclaration
+						TypeDeclaration = interfaceDeclaration,
+						SourceRelationships = new List<Relationship>(),
+						TargetRelationships = new List<Relationship>()
 					});
 				}
 
@@ -54,11 +56,12 @@ namespace tcc
 					{
 						Name = classDeclaration.Identifier.ValueText,
 						SemanticType = typeSymbol.ToString(),
-						LineNumber = classDeclaration.SpanStart,
 						AccessModifier = classDeclaration.Modifiers.ToString(),
-						Type = Models.EEntityType.CLASS,
+						Type = EEntityType.CLASS,
 						SyntaxTree = syntaxTree,
-						TypeDeclaration = classDeclaration
+						TypeDeclaration = classDeclaration,
+						SourceRelationships = new List<Relationship>(),
+						TargetRelationships = new List<Relationship>()
 					});
 				}
 			}
