@@ -12,7 +12,7 @@ using tcc.Models;
 
 namespace tcc
 {
-	class Extractor
+	public class Extractor
     {
         private string SlnPath { get; set; }
 		public Repository Repository { get; set; }
@@ -261,7 +261,9 @@ namespace tcc
 
 		public void Run()
         {
-			MSBuildLocator.RegisterMSBuildPath("C:\\Program Files\\dotnet\\sdk\\3.1.101");
+			if(MSBuildLocator.CanRegister)
+				MSBuildLocator.RegisterMSBuildPath("C:\\Program Files\\dotnet\\sdk\\3.1.101");
+			
 			var partialCompilation = CSharpCompilation.Create("compilation")
 				.AddReferences(
 					MetadataReference.CreateFromFile(

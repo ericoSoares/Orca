@@ -4,7 +4,7 @@ using System.Text;
 
 namespace tcc.Models
 {
-    class DesignPattern
+    public class DesignPattern
     {
         public string Name { get; set; }
         public string Description { get; set; }

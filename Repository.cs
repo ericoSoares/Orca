@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace tcc
 {
-    class Repository
+    public class Repository
     {
         public IList<Entity> Entities { get; set; }
         public IList<Relationship> Relationships { get; set; }

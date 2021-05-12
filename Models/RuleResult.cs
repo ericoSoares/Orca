@@ -4,7 +4,7 @@ using System.Text;
 
 namespace tcc.Models
 {
-    class RuleResult
+    public class RuleResult
     {
         public Rule Rule { get; set; }
         public string FilePath { get; set; }

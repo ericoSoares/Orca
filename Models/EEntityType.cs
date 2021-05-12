@@ -4,7 +4,7 @@ using System.Text;
 
 namespace tcc.Models
 {
-    enum EEntityType
+    public enum EEntityType
     {
         CLASS = 1,
         INTERFACE

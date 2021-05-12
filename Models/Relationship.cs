@@ -4,7 +4,7 @@ using System.Text;
 
 namespace tcc.Models
 {
-    class Relationship
+    public class Relationship
     {
         public int Id { get; set; }
         public Entity Source { get; set; }

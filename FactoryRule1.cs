@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace tcc
 {
-    class FactoryRule1 : Rule
+    public class FactoryRule1 : Rule
     {
         public FactoryRule1(Repository repository)
         {

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace tcc.Models
 {
-    abstract class Rule
+    public abstract class Rule
     {
         public string Name { get; set; }
         public string Description { get; set; }

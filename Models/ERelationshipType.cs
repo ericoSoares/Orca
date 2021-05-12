@@ -4,7 +4,7 @@ using System.Text;
 
 namespace tcc.Models
 {
-    enum ERelationshipType
+    public enum ERelationshipType
     {
         ASSOCIATION = 1,
         AGGREGATION,
