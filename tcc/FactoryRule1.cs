@@ -12,6 +12,8 @@ namespace tcc
         {
             this.Repository = repository;
             this.Name = "ClassesWithMoreThan3Instantiations";
+            this.Description = "Uma classe A não pode instanciar uma classe B mais de 3 vezes";
+            this.DesignPattern = this.DesignPatternRepository.Factory;
         }
 
         public override IList<RuleResult> Execute()

@@ -22,12 +22,35 @@ const AnalysisResult = ({ slnPath, excludedProjects }) => {
     }, []);
 
     const renderTable = () => {
-        console.log(analysisResult);
-        return analysisResult.map(r => {
-            return (
-                <div>{`${r.ruleName} - ${r.filePath} - ${r.lineNumber}`}</div>
-            )
-        })
+        return (
+            <div class="container table-responsive py-5">
+                <h2>Análise</h2>
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Regra</th>
+                            <th scope="col">Descrição</th>
+                            <th scope="col">Arquivo</th>
+                            <th scope="col">Linha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {analysisResult.map(r => renderTableRow(r))}
+                    </tbody>
+                </table>
+            </div>
+        )
+    }
+
+    const renderTableRow = (rowData) => {
+        return (
+            <tr>
+                <th scope="row">{rowData.ruleName}</th>
+                <td>{rowData.ruleDescription}</td>
+                <td>{rowData.filePath}</td>
+                <td>{rowData.lineNumber}</td>
+            </tr>
+        );
     }
 
     return (

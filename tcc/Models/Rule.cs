@@ -10,6 +10,7 @@ namespace tcc.Models
         public string Description { get; set; }
         public DesignPattern DesignPattern { get; set; }
         public Repository Repository { get; set; }
+        public DesignPatternRepository DesignPatternRepository => new DesignPatternRepository();
 
         public virtual IList<RuleResult> Execute()
         {
