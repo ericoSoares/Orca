@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 
-export const AnalysisResult = () => {
+const AnalysisResult = ({ slnPath, excludedProjects }) => {
 
     const [analysisResult, setAnalysisResult] = useState({});
     const [dataLoaded, setDataLoaded] = useState(false);
@@ -8,14 +8,15 @@ export const AnalysisResult = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const response = await fetch('analysis');
+            console.log(slnPath, excludedProjects);
+            const response = await fetch('analysis?slnPath=' + slnPath + '&excluded=' + excludedProjects);
             const data = await response.json();
             setAnalysisResult(data);
-            setDataLoaded(true);
             setLoading(false);
         }
         if (!dataLoaded) {
             fetchData();
+            setDataLoaded(true);
         }
 
     }, []);
@@ -27,3 +28,5 @@ export const AnalysisResult = () => {
         </div>
     );
 }
+
+export default AnalysisResult;

@@ -22,11 +22,11 @@ namespace webapp.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<RuleResultDto> Get(string slnPath = "")
+        public IEnumerable<RuleResultDto> Get(string slnPath = "", string excluded = "")
         {
             var project1 = @"C:\Users\erico\source\repos\clean-architecture-manga\Clean-Architecture-Manga.sln";
             var project2 = @"C:\Users\erico\source\repos\TestProject\TestProject.sln";
-            var extractor = new Extractor(project2);
+            var extractor = new Extractor(slnPath);
             extractor.Run();
             var ruleResults = new FactoryRule1(extractor.Repository).Execute();
             return ruleResults.Select(r => new RuleResultDto()

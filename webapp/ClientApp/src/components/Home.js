@@ -1,33 +1,54 @@
 import React, { useState } from 'react';
+import AnalysisResult from './AnalysisResult';
 
 export const Home = ({ triggerAnalysis }) => {
     const [slnPath, setSlnPath] = useState("C:\\Users\\erico\\source\\repos\\TestProject\\TestProject.sln");
     const [excludedProjects, setExcludedProjects] = useState("");
-    return (
-        <div
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: '100%',
-                width: '100%'
-            }}
-        >
-            <div>
-                <div>Aponte o caminho da solution a ser analisada</div>
-                <input
-                    type="text"
-                    value={slnPath}
-                    onChange={(e) => setSlnPath(e.target.value)} style={{ width: '100%' }}
-                />
-                <div>Excluir projetos:</div>
-                <textarea
-                    onChange={(e) => setExcludedProjects(e.target.value)}
-                    style={{ width: '100%', height: '100px' }}
-                />
-                <br />
-                <button className="btn btn-primary" onClick={triggerAnalysis}>Analisar</button>
+    const [analysisTriggered, setAnalysisTriggered] = useState(false);
+
+    const renderForm = () => {
+        return (
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '100%',
+                    width: '100%',
+                }}
+            >
+                <div className="card shadow-sm" style={{ padding: 60 }}>
+                    <div style={{ width: 400 }}>
+                        <div className="form-group">
+                            <label for="slnPathInput">Caminho da Solution (.sln)</label>
+                            <input
+                                id="slnPathInput"
+                                className="form-control"
+                                type="text"
+                                value={slnPath}
+                                onChange={(e) => setSlnPath(e.target.value)} style={{ width: '100%' }}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label for="excludedInput">Excluir projetos:</label>
+                            <textarea
+                                id="excludedInput"
+                                className="form-control"
+                                placeholder="separar projetos com ;"
+                                onChange={(e) => setExcludedProjects(e.target.value)}
+                                style={{ width: '100%', height: '100px' }}
+                            />
+                        </div>
+                        <button className="btn btn-primary" onClick={() => setAnalysisTriggered(true)}>Analisar</button>
+                    </div>
+                </div>
             </div>
-        </div>
-    );
+        );
+    }
+
+    if (analysisTriggered) {
+        return (<AnalysisResult slnPath={slnPath} excludedProjects={excludedProjects} />);
+    } else {
+        return renderForm();
+    }
 }
