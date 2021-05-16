@@ -17,6 +17,7 @@ namespace tcc.Models
         public SyntaxTree SyntaxTree { get; set; }
         public IList<Relationship> SourceRelationships { get; set; }
         public IList<Relationship> TargetRelationships { get; set; }
+        public string ProjectName { get; set; }
 
         public string FilePath
         {

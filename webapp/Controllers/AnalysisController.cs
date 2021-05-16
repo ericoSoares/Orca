@@ -14,9 +14,9 @@ namespace webapp.Controllers
     [ApiController]
     public class AnalysisController : ControllerBase
     {
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly ILogger<AnalysisController> _logger;
 
-        public AnalysisController(ILogger<WeatherForecastController> logger)
+        public AnalysisController(ILogger<AnalysisController> logger)
         {
             _logger = logger;
         }
@@ -26,11 +26,14 @@ namespace webapp.Controllers
         {
             var project1 = @"C:\Users\erico\source\repos\clean-architecture-manga\Clean-Architecture-Manga.sln";
             var project2 = @"C:\Users\erico\source\repos\TestProject\TestProject.sln";
-            var extractor = new Extractor(slnPath);
+            var excludedList = excluded.Split(";");
+            var extractor = new Extractor(slnPath, excludedList);
             extractor.Run();
             var ruleResults = new FactoryRule1(extractor.Repository).Execute();
             return ruleResults.Select(r => new RuleResultDto()
             {
+                RuleName = r.Rule.Name,
+                RuleDescription = r.Rule.Description,
                 FilePath = r.FilePath,
                 LineNumber = r.LineNumber
             }).ToArray();

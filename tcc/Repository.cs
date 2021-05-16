@@ -48,7 +48,7 @@ namespace tcc
 
             return true;
         }
-
+        
         public void PrintStatus()
         {
             Console.WriteLine("Total entities: " + this.Entities.Count);

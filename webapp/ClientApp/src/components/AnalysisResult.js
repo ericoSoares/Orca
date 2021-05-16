@@ -21,10 +21,19 @@ const AnalysisResult = ({ slnPath, excludedProjects }) => {
 
     }, []);
 
+    const renderTable = () => {
+        console.log(analysisResult);
+        return analysisResult.map(r => {
+            return (
+                <div>{`${r.ruleName} - ${r.filePath} - ${r.lineNumber}`}</div>
+            )
+        })
+    }
+
     return (
         <div>
             {loading && <div>Analisando...</div>}
-            {!loading && <div>{JSON.stringify(analysisResult)}</div>}
+            {!loading && <div>{renderTable()}</div>}
         </div>
     );
 }

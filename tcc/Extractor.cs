@@ -15,15 +15,17 @@ namespace tcc
 	public class Extractor
     {
         private string SlnPath { get; set; }
+		private IList<string> Excluded { get; set; }
 		public Repository Repository { get; set; }
 
-		public Extractor(string slnPath)
+		public Extractor(string slnPath, IList<string> excluded)
         {
             this.SlnPath = slnPath;
+			this.Excluded = excluded;
 			this.Repository = new Repository();
         }
 
-		public void ExtractEntities(Compilation compilation)
+		public void ExtractEntities(Compilation compilation, IList<Project> projects)
 		{
 			foreach (var syntaxTree in compilation.SyntaxTrees)
 			{
@@ -32,6 +34,9 @@ namespace tcc
 				var classDeclarations = root.DescendantNodes().OfType<ClassDeclarationSyntax>().ToList();
 
 				var semanticModel = compilation.GetSemanticModel(syntaxTree);
+
+				var currentProject = projects
+					.Where(r => r.Documents.Select(x => x.FilePath.ToString()).Contains(syntaxTree.FilePath)).FirstOrDefault();
 
 				foreach (var interfaceDeclaration in interfaceDeclarations)
 				{
@@ -45,7 +50,8 @@ namespace tcc
 						SyntaxTree = syntaxTree,
 						TypeDeclaration = interfaceDeclaration,
 						SourceRelationships = new List<Relationship>(),
-						TargetRelationships = new List<Relationship>()
+						TargetRelationships = new List<Relationship>(),
+						ProjectName = currentProject.Name.ToString()
 					});
 				}
 
@@ -61,7 +67,8 @@ namespace tcc
 						SyntaxTree = syntaxTree,
 						TypeDeclaration = classDeclaration,
 						SourceRelationships = new List<Relationship>(),
-						TargetRelationships = new List<Relationship>()
+						TargetRelationships = new List<Relationship>(),
+						ProjectName = currentProject.Name.ToString()
 					});
 				}
 			}
@@ -270,6 +277,7 @@ namespace tcc
 					typeof(object).Assembly.Location));
 
 			List<SyntaxTree> trees = new List<SyntaxTree>();
+			List<Project> projects = new List<Project>();
 			using (var workspace = MSBuildWorkspace.Create())
 			{
 				// Read solution from specified path
@@ -279,9 +287,10 @@ namespace tcc
 				foreach (var proj in solution.Projects)
 				{
 					Console.WriteLine("Project: " + proj.Name);
-					var excluded = new List<string>() { "ComponentTests", "IntegrationTests", "UnitTests" };
 
-					if (excluded.Contains(proj.Name)) continue;
+					if (this.Excluded != null && this.Excluded.Contains(proj.Name)) continue;
+
+					projects.Add(proj);
 
 					foreach (var doc in proj.Documents)
 					{
@@ -293,7 +302,7 @@ namespace tcc
 
 			var compilation = (Compilation)partialCompilation.AddSyntaxTrees(trees);
 
-			this.ExtractEntities(compilation);
+			this.ExtractEntities(compilation, projects);
 			this.ExtractRelationships(compilation);
 		}
     }

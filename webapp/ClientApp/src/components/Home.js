@@ -3,7 +3,7 @@ import AnalysisResult from './AnalysisResult';
 
 export const Home = ({ triggerAnalysis }) => {
     const [slnPath, setSlnPath] = useState("C:\\Users\\erico\\source\\repos\\TestProject\\TestProject.sln");
-    const [excludedProjects, setExcludedProjects] = useState("");
+    const [excludedProjects, setExcludedProjects] = useState("ComponentTests;IntegrationTests;UnitTests");
     const [analysisTriggered, setAnalysisTriggered] = useState(false);
 
     const renderForm = () => {
@@ -20,7 +20,7 @@ export const Home = ({ triggerAnalysis }) => {
                 <div className="card shadow-sm" style={{ padding: 60 }}>
                     <div style={{ width: 400 }}>
                         <div className="form-group">
-                            <label for="slnPathInput">Caminho da Solution (.sln)</label>
+                            <label htmlFor="slnPathInput">Caminho da Solution (.sln)</label>
                             <input
                                 id="slnPathInput"
                                 className="form-control"
@@ -30,7 +30,7 @@ export const Home = ({ triggerAnalysis }) => {
                             />
                         </div>
                         <div className="form-group">
-                            <label for="excludedInput">Excluir projetos:</label>
+                            <label htmlFor="excludedInput">Excluir projetos:</label>
                             <textarea
                                 id="excludedInput"
                                 className="form-control"

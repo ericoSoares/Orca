@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -15,7 +16,7 @@ namespace SemanticQuickStart
 
             var project1 = @"C:\Users\erico\source\repos\clean-architecture-manga\Clean-Architecture-Manga.sln";
             var project2 = @"C:\Users\erico\source\repos\TestProject\TestProject.sln";
-            var extractor = new Extractor(project2);
+            var extractor = new Extractor(project2, new List<string>());
             extractor.Run();
             extractor.Repository.PrintStatus();
 
