@@ -29,7 +29,7 @@ namespace webapp.Controllers
             var excludedList = excluded.Split(";");
             var extractor = new Extractor(slnPath, excludedList);
             extractor.Run();
-            var ruleResults = new FactoryRule1(extractor.Repository).Execute();
+            var ruleResults = new FactoryRule1().Execute(extractor.Repository);
             return ruleResults.Select(r => new RuleResultDto()
             {
                 RuleName = r.Rule.Name,

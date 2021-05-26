@@ -16,11 +16,15 @@ namespace SemanticQuickStart
 
             var project1 = @"C:\Users\erico\source\repos\clean-architecture-manga\Clean-Architecture-Manga.sln";
             var project2 = @"C:\Users\erico\source\repos\TestProject\TestProject.sln";
-            var extractor = new Extractor(project2, new List<string>());
+            var project3 = @"C:\Users\erico\source\repos\machinelearning\Microsoft.ML.sln";
+            var project4 = @"C:\Users\erico\source\repos\eShopOnContainers\src\eShopOnContainers-ServicesAndWebApps.sln";
+            var project5 = @"C:\Users\erico\source\repos\eShopOnWeb\eShopOnWeb.sln";
+            var extractor = new Extractor(project5, new List<string>());
             extractor.Run();
             extractor.Repository.PrintStatus();
 
-            var ruleResults = new FactoryRule1(extractor.Repository).Execute();
+            var ruleResults = new FactoryRule1().Execute(extractor.Repository);
+
             foreach(var ruleResult in ruleResults)
             {
                 Console.WriteLine(ruleResult.ToString());

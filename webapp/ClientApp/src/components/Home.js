@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import AnalysisResult from './AnalysisResult';
 
 export const Home = ({ triggerAnalysis }) => {
-    const [slnPath, setSlnPath] = useState("C:\\Users\\erico\\source\\repos\\TestProject\\TestProject.sln");
+    const [slnPath, setSlnPath] = useState("C:\\Users\\erico\\source\\repos\\eShopOnWeb\\eShopOnWeb.sln");
     const [excludedProjects, setExcludedProjects] = useState("ComponentTests;IntegrationTests;UnitTests");
     const [analysisTriggered, setAnalysisTriggered] = useState(false);
 
