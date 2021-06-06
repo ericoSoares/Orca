@@ -11,5 +11,6 @@ namespace webapp
         public string RuleDescription { get; set; }
         public string FilePath { get; set; }
         public int LineNumber { get; set; }
+        public int SeverityLevel { get; set; }
     }
 }

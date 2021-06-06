@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace tcc.Models
@@ -8,6 +9,7 @@ namespace tcc.Models
     {
         public string Name { get; set; }
         public string Description { get; set; }
+        public int SeverityLevel { get; set; }
         public DesignPattern DesignPattern { get; set; }
         public DesignPatternRepository DesignPatternRepository => new DesignPatternRepository();
 

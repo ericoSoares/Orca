@@ -29,13 +29,14 @@ namespace webapp.Controllers
             var excludedList = excluded.Split(";");
             var extractor = new Extractor(slnPath, excludedList);
             extractor.Run();
-            var ruleResults = new FactoryRule1().Execute(extractor.Repository);
+            var ruleResults = new RuleDriver().ExecuteRules(extractor.Repository);
             return ruleResults.Select(r => new RuleResultDto()
             {
                 RuleName = r.Rule.Name,
                 RuleDescription = r.Rule.Description,
                 FilePath = r.FilePath,
-                LineNumber = r.LineNumber
+                LineNumber = r.LineNumber,
+                SeverityLevel = r.Rule.SeverityLevel
             }).ToArray();
         }
     }

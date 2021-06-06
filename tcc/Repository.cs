@@ -44,6 +44,28 @@ namespace tcc
         
         public void PrintStatus()
         {
+            var totalClasses = this.Entities.Where(r => r.Type == EEntityType.CLASS).Count();
+            var totalInterfaces = this.Entities.Where(r => r.Type == EEntityType.INTERFACE).Count();
+            var totalInheritances = this.Relationships.Where(r => r.Type == ERelationshipType.INHERITANCE).Count();
+            var totalImplementations = this.Relationships.Where(r => r.Type == ERelationshipType.IMPLEMENTATION).Count();
+            var totalReceptionsInMethod = this.Relationships.Where(r => r.Type == ERelationshipType.RECEPTION_IN_METHOD).Count();
+            var totalReceptionsInCtor = this.Relationships.Where(r => r.Type == ERelationshipType.RECEPTION_IN_CONSTRUCTOR).Count();
+            var totalInstantiationsInClass = this.Relationships.Where(r => r.Type == ERelationshipType.INSTANTIATION_IN_CLASS).Count();
+            var totalInstantiationsInMethod = this.Relationships.Where(r => r.Type == ERelationshipType.INSTANTIATION_IN_METHOD).Count();
+            var totalInstantiationsInCtor = this.Relationships.Where(r => r.Type == ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR).Count();
+            var totalDependencies = this.Relationships.Where(r => r.Type == ERelationshipType.DEPENDENCY).Count();
+
+            Console.WriteLine("Total classes: " + totalClasses);
+            Console.WriteLine("Total interfaces: " + totalInterfaces);
+            Console.WriteLine("Total inheritances: " + totalInheritances);
+            Console.WriteLine("Total implementations: " + totalImplementations);
+            Console.WriteLine("Total recep on method: " + totalReceptionsInMethod);
+            Console.WriteLine("Total recep on ctor: " + totalReceptionsInCtor);
+            Console.WriteLine("Total inst in class: " + totalInstantiationsInClass);
+            Console.WriteLine("Total inst in method: " + totalInstantiationsInMethod);
+            Console.WriteLine("Total inst in ctor: " + totalInstantiationsInCtor);
+            Console.WriteLine("Total dependencies: " + totalDependencies);
+
             Console.WriteLine("Total entities: " + this.Entities.Count);
             Console.WriteLine("Total relationships: " + this.Relationships.Count);
         }
