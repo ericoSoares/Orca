@@ -7,9 +7,9 @@ namespace tcc.Models
 {
     public abstract class Rule
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public int SeverityLevel { get; set; }
+        public string Name { get; set; } = "A rule name";
+        public string Description { get; set; } = "A rule description";
+        public ESeverityLevel SeverityLevel { get; set; } = ESeverityLevel.BLOCKER;
         public DesignPattern DesignPattern { get; set; }
         public DesignPatternRepository DesignPatternRepository => new DesignPatternRepository();
 

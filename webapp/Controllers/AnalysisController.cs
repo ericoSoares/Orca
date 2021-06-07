@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace webapp.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<RuleResultDto> Get(string slnPath = "", string excluded = "")
+        public AnalysisResultDto Get(string slnPath = "", string excluded = "")
         {
             var project1 = @"C:\Users\erico\source\repos\clean-architecture-manga\Clean-Architecture-Manga.sln";
             var project2 = @"C:\Users\erico\source\repos\TestProject\TestProject.sln";
@@ -30,14 +31,28 @@ namespace webapp.Controllers
             var extractor = new Extractor(slnPath, excludedList);
             extractor.Run();
             var ruleResults = new RuleDriver().ExecuteRules(extractor.Repository);
-            return ruleResults.Select(r => new RuleResultDto()
-            {
-                RuleName = r.Rule.Name,
-                RuleDescription = r.Rule.Description,
-                FilePath = r.FilePath,
-                LineNumber = r.LineNumber,
-                SeverityLevel = r.Rule.SeverityLevel
-            }).ToArray();
+            var analysisResult = new AnalysisResultDto();
+
+            var ruleResultGroups = ruleResults
+                .GroupBy(r => r.FilePath)
+                .Select(r => new RuleResultsGroupDto
+                {
+                    FilePath = r.Key,
+                    FileName = Path.GetFileName(r.Key),
+                    RuleResults = r.Select(x => new RuleResultDto
+                    {
+                        LineNumber = x.LineNumber,
+                        DPName = x.Rule.DesignPattern.Name,
+                        DPExtraInfo = x.Rule.DesignPattern.MoreInfoUrl,
+                        RuleDescription = x.Rule.Description,
+                        RuleName = x.Rule.Name,
+                        SeverityLevel = x.Rule.SeverityLevel
+                    }).ToList()
+                })
+                .ToList();
+
+            analysisResult.RuleResultGroups = ruleResultGroups;
+            return analysisResult;
         }
     }
 }

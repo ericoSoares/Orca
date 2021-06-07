@@ -45,6 +45,7 @@ namespace tcc
             this.Name = "FatoryRule2";
             this.Description = "Um método não pode instanciar uma classe mais do que 3 vezes";
             this.DesignPattern = this.DesignPatternRepository.Factory;
+            this.SeverityLevel = ESeverityLevel.BLOCKER;
         }
 
         public override IList<RuleResult> Execute(Repository repository)

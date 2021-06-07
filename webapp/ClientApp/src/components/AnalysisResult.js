@@ -1,10 +1,13 @@
 ﻿import React, { useState, useEffect } from 'react';
+import Report from './Report';
+import Overview from './Overview';
 
 const AnalysisResult = ({ slnPath, excludedProjects }) => {
 
     const [analysisResult, setAnalysisResult] = useState({});
     const [dataLoaded, setDataLoaded] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [selectedTab, setSelectedTab] = useState(1);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -21,42 +24,24 @@ const AnalysisResult = ({ slnPath, excludedProjects }) => {
 
     }, []);
 
-    const renderTable = () => {
-        return (
-            <div class="container table-responsive py-5">
-                <h2>Análise</h2>
-                <table class="table table-bordered table-hover">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th scope="col">Regra</th>
-                            <th scope="col">Descrição</th>
-                            <th scope="col">Arquivo</th>
-                            <th scope="col">Linha</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {analysisResult.map(r => renderTableRow(r))}
-                    </tbody>
-                </table>
-            </div>
-        )
-    }
-
-    const renderTableRow = (rowData) => {
-        return (
-            <tr>
-                <th scope="row">{rowData.ruleName}</th>
-                <td>{rowData.ruleDescription}</td>
-                <td>{rowData.filePath}</td>
-                <td>{rowData.lineNumber}</td>
-            </tr>
-        );
-    }
+    if (loading) return <div>Analisando...</div>;
 
     return (
         <div>
-            {loading && <div>Analisando...</div>}
-            {!loading && <div>{renderTable()}</div>}
+            <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+                <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">RePattern</a>
+                <ul class="navbar-nav px-3">
+                    <li class="nav-item px-2 text-nowrap">
+                        <a class="nav-link" href="#" onClick={() => setSelectedTab(0)}>Overview</a>
+                    </li>
+                    <li class="nav-item text-nowrap">
+                        <a class="nav-link" href="#" onClick={() => setSelectedTab(1)}>Report</a>
+                    </li>
+                </ul>
+            </nav>
+
+            {selectedTab === 0 && <Overview analysisResult={analysisResult} />}
+            {selectedTab === 1 && <Report analysisResult={analysisResult} />}
         </div>
     );
 }
