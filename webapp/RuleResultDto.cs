@@ -42,6 +42,31 @@ namespace webapp
 
     public class OverviewDto
     {
-        public int TotalOportunities { get; set; }
+        public int OpportunitiesBlocker { get; set; } = 0;
+        public int OpportunitiesCritical { get; set; } = 0;
+        public int OpportunitiesMajor { get; set; } = 0;
+        public int OpportunitiesMinor { get; set; } = 0;
+        public int OpportunitiesInfo { get; set; } = 0;
+        public int FilesAnalysed{ get; set; } = 0;
+        public List<string> RuleNames { get; set; } = new List<string>();
+        public List<string> DPNames { get; set; } = new List<string>();
+        public EntitiesDto Entities { get; set; } = new EntitiesDto();
+        public RelationshipsDto Relationships { get; set; } = new RelationshipsDto();
+        
+    }
+
+    public class EntitiesDto
+    {
+        public int Classes { get; set; }
+        public int Interfaces { get; set; }
+    }
+
+    public class RelationshipsDto
+    {
+        public int Inheritances { get; set; }
+        public int Implementations { get; set; }
+        public int Receptions { get; set; }
+        public int Instantiations { get; set; }
+        public int Dependencies { get; set; }
     }
 }

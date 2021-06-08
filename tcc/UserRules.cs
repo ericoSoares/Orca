@@ -13,6 +13,7 @@ namespace tcc
             this.Name = "FatoryRule1";
             this.Description = "Uma classe A não pode instanciar uma classe B mais de 3 vezes";
             this.DesignPattern = this.DesignPatternRepository.Factory;
+            this.SeverityLevel = ESeverityLevel.CRITICAL;
         }
 
         public override IList<RuleResult> Execute(Repository repository)
@@ -78,6 +79,7 @@ namespace tcc
             this.Name = "FatoryRule3";
             this.Description = "Uma classe instancia classes da 'mesma familia' mais de uma vez";
             this.DesignPattern = this.DesignPatternRepository.Factory;
+            this.SeverityLevel = ESeverityLevel.MINOR;
         }
 
         public override IList<RuleResult> Execute(Repository repository)

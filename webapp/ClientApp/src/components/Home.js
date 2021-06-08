@@ -47,7 +47,7 @@ export const Home = ({ triggerAnalysis }) => {
     }
 
     if (analysisTriggered) {
-        return (<AnalysisResult slnPath={slnPath} excludedProjects={excludedProjects} />);
+        return (<AnalysisResult slnPath={slnPath} setAnalysisTriggered={setAnalysisTriggered} excludedProjects={excludedProjects} />);
     } else {
         return renderForm();
     }

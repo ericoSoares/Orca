@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using tcc.Models;
 
@@ -18,6 +19,18 @@ namespace tcc
             }
 
             return results;
+        }
+
+        public List<string> GetDPNames()
+        {
+            var ruleClasses = ReflectiveEnumerator.GetEnumerableOfType<Rule>();
+            return ruleClasses.Select(r => r.DesignPattern.Name).Distinct().ToList();
+        }
+
+        public List<string> GetRuleNames()
+        {
+            var ruleClasses = ReflectiveEnumerator.GetEnumerableOfType<Rule>();
+            return ruleClasses.Select(r => r.Name).Distinct().ToList();
         }
     }
 }

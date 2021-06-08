@@ -2,6 +2,11 @@
 html, body, #root {
     height: 100%;
     width: 100%;
+
+}
+
+#root {
+    background: #eee;
 }
 
 a {
@@ -98,12 +103,29 @@ body {
  * Navbar
  */
 
+.loadingScreen {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    font-weight: bold;
+    color: grey;
+}
+
 .navbar-brand {
     padding-top: .75rem;
     padding-bottom: .75rem;
     font-size: 1rem;
     background-color: rgba(0, 0, 0, .25);
     box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
+}
+
+.navbarListContainer {
+    display: flex;
+    justify-content: space-between;
+    width: 85%;
 }
 
 .navbar .form-control {
@@ -123,14 +145,21 @@ body {
         box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
     }
 
+.navbar {
+    justify-content: flex-start;
+}
+
 .listItem {
     width: 98%;
-    height: 73px;
+    height: 85px;
     border: 1px solid lightgrey;
     padding: 15px;
     font-family: 'Calibri';
     margin-top: 5px;
     margin-bottom: 5px;
+    font-size: 18px;
+    cursor: default;
+    background: white;
 }
 
 .listHeader h4 {
@@ -151,6 +180,8 @@ body {
 
 .ruleLineNumber {
     margin: 0;
+    color: black;
+    font-weight: bold;
 }
 
 .itemBody {
@@ -163,6 +194,52 @@ body {
         color: red;
     }
 
+.fileRuleCount {
+    background: grey;
+    color: white;
+    border-radius: 100%;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-right: 5px;
+}
 
+.severityBlocker {
+    background: darkred;
+    font-weight: bold;
+    color: white;
+    padding: 3px;
+}
+
+.severityCritical {
+    background: red;
+    font-weight: bold;
+    color: white;
+    padding: 3px;
+}
+
+.severityMajor {
+    background: orangered;
+    font-weight: bold;
+    color: white;
+    padding: 3px;
+}
+
+.severityMinor {
+    background: orange;
+    font-weight: bold;
+    color: white;
+    padding: 3px;
+}
+
+.severityInfo {
+    background: forestgreen;
+    font-weight: bold;
+    color: white;
+    padding: 3px;
+}
+
+.dashboardCard {
+    padding: 30px;
+}
 
 

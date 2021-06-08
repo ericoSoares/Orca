@@ -51,6 +51,36 @@ namespace webapp.Controllers
                 })
                 .ToList();
 
+            var overview = new OverviewDto();
+            overview.OpportunitiesBlocker = ruleResults.Where(r => r.Rule.SeverityLevel == ESeverityLevel.BLOCKER).Count();
+            overview.OpportunitiesCritical = ruleResults.Where(r => r.Rule.SeverityLevel == ESeverityLevel.CRITICAL).Count();
+            overview.OpportunitiesMajor = ruleResults.Where(r => r.Rule.SeverityLevel == ESeverityLevel.MAJOR).Count();
+            overview.OpportunitiesMinor = ruleResults.Where(r => r.Rule.SeverityLevel == ESeverityLevel.MINOR).Count();
+            overview.OpportunitiesInfo = ruleResults.Where(r => r.Rule.SeverityLevel == ESeverityLevel.INFO).Count();
+            overview.FilesAnalysed = extractor.Repository.Entities.GroupBy(r => r.FilePath).Count();
+            overview.RuleNames = new RuleDriver().GetRuleNames();
+            overview.DPNames = new RuleDriver().GetDPNames();
+
+            overview.Entities = new EntitiesDto()
+            {
+                Classes = extractor.Repository.Entities.Where(r => r.Type == EEntityType.CLASS).Count(),
+                Interfaces = extractor.Repository.Entities.Where(r => r.Type == EEntityType.INTERFACE).Count(),
+            };
+            overview.Relationships = new RelationshipsDto()
+            {
+                Implementations = extractor.Repository.Relationships.Where(r => r.Type == ERelationshipType.IMPLEMENTATION).Count(),
+                Inheritances = extractor.Repository.Relationships.Where(r => r.Type == ERelationshipType.INHERITANCE).Count(),
+                Dependencies = extractor.Repository.Relationships.Where(r => r.Type == ERelationshipType.DEPENDENCY).Count(),
+                Instantiations = extractor.Repository.Relationships
+                    .Where(r => r.Type == ERelationshipType.INSTANTIATION_IN_CLASS
+                        || r.Type == ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR
+                        || r.Type == ERelationshipType.INSTANTIATION_IN_METHOD).Count(),
+                Receptions = extractor.Repository.Relationships
+                    .Where(r => r.Type == ERelationshipType.RECEPTION_IN_CONSTRUCTOR
+                        || r.Type == ERelationshipType.RECEPTION_IN_METHOD).Count()
+            };
+
+            analysisResult.Overview = overview;
             analysisResult.RuleResultGroups = ruleResultGroups;
             return analysisResult;
         }
