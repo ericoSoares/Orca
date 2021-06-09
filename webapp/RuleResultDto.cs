@@ -50,15 +50,19 @@ namespace webapp
         public int FilesAnalysed{ get; set; } = 0;
         public List<string> RuleNames { get; set; } = new List<string>();
         public List<string> DPNames { get; set; } = new List<string>();
-        public EntitiesDto Entities { get; set; } = new EntitiesDto();
+        public List<EntityDto> Entities { get; set; } = new List<EntityDto>();
         public RelationshipsDto Relationships { get; set; } = new RelationshipsDto();
+        public List<RuleDto> Rules { get; set; } = new List<RuleDto>();
+        public List<DPDto> DesignPatterns { get; set; } = new List<DPDto>();
         
     }
 
-    public class EntitiesDto
+    public class EntityDto
     {
-        public int Classes { get; set; }
-        public int Interfaces { get; set; }
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public string Project { get; set; }
+        public string File { get; set; }
     }
 
     public class RelationshipsDto
@@ -68,5 +72,20 @@ namespace webapp
         public int Receptions { get; set; }
         public int Instantiations { get; set; }
         public int Dependencies { get; set; }
+    }
+
+    public class RuleDto
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public int SeverityLevel { get; set; }
+        public string DPName { get; set; }
+    }
+
+    public class DPDto
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string MoreInfoUrl { get; set; }
     }
 }

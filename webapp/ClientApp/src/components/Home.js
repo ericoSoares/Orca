@@ -17,7 +17,7 @@ export const Home = ({ triggerAnalysis }) => {
                     width: '100%',
                 }}
             >
-                <div className="card shadow-sm" style={{ padding: 60 }}>
+                <div className="card shadow-sm" style={{ padding: 60, marginTop: 100 }}>
                     <div style={{ width: 400 }}>
                         <div className="form-group">
                             <label htmlFor="slnPathInput">Caminho da Solution (.sln)</label>

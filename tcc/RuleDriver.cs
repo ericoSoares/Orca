@@ -26,11 +26,22 @@ namespace tcc
             var ruleClasses = ReflectiveEnumerator.GetEnumerableOfType<Rule>();
             return ruleClasses.Select(r => r.DesignPattern.Name).Distinct().ToList();
         }
+        public List<DesignPattern> GetDPs()
+        {
+            var ruleClasses = ReflectiveEnumerator.GetEnumerableOfType<Rule>();
+            return ruleClasses.Select(r => r.DesignPattern).ToList();
+        }
 
         public List<string> GetRuleNames()
         {
             var ruleClasses = ReflectiveEnumerator.GetEnumerableOfType<Rule>();
             return ruleClasses.Select(r => r.Name).Distinct().ToList();
+        }
+
+        public List<Rule> GetRules()
+        {
+            var ruleClasses = ReflectiveEnumerator.GetEnumerableOfType<Rule>();
+            return ruleClasses.ToList();
         }
     }
 }

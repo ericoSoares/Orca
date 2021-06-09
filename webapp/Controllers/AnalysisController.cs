@@ -61,11 +61,29 @@ namespace webapp.Controllers
             overview.RuleNames = new RuleDriver().GetRuleNames();
             overview.DPNames = new RuleDriver().GetDPNames();
 
-            overview.Entities = new EntitiesDto()
+            overview.Entities = extractor.Repository.Entities.Select(r => new EntityDto
             {
-                Classes = extractor.Repository.Entities.Where(r => r.Type == EEntityType.CLASS).Count(),
-                Interfaces = extractor.Repository.Entities.Where(r => r.Type == EEntityType.INTERFACE).Count(),
-            };
+                Name = r.Name,
+                Type = (r.Type == EEntityType.CLASS ? "Class" : "Interface"),
+                Project = r.ProjectName,
+                File = r.FilePath
+            }).OrderBy(r => r.Project).ThenBy(r => r.Type).ToList();
+
+            overview.Rules = new RuleDriver().GetRules().Select(r => new RuleDto
+            {
+                Name = r.Name,
+                Description = r.Description,
+                SeverityLevel = (int)(r.SeverityLevel),
+                DPName = r.DesignPattern.Name
+            }).OrderBy(r => r.Name).ToList();
+
+            overview.DesignPatterns = new RuleDriver().GetDPs().Select(r => new DPDto
+            {
+                Name = r.Name,
+                Description = r.Description,
+                MoreInfoUrl = r.MoreInfoUrl
+            }).GroupBy(r => r.Name).Select(r => r.First()).OrderBy(r => r.Name).ToList();
+
             overview.Relationships = new RelationshipsDto()
             {
                 Implementations = extractor.Repository.Relationships.Where(r => r.Type == ERelationshipType.IMPLEMENTATION).Count(),

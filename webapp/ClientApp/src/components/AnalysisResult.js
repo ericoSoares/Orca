@@ -7,7 +7,7 @@ const AnalysisResult = ({ slnPath, excludedProjects, setAnalysisTriggered }) => 
     const [analysisResult, setAnalysisResult] = useState({});
     const [dataLoaded, setDataLoaded] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [selectedTab, setSelectedTab] = useState(1);
+    const [selectedTab, setSelectedTab] = useState(0);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -47,7 +47,7 @@ const AnalysisResult = ({ slnPath, excludedProjects, setAnalysisTriggered }) => 
                 </div>
             </nav>
 
-            {selectedTab === 0 && <Overview analysisResult={analysisResult} />}
+            {selectedTab === 0 && <Overview overview={analysisResult.overview} />}
             {selectedTab === 1 && <Report analysisResult={analysisResult} />}
         </div>
     );
