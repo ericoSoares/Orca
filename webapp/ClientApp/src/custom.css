@@ -173,6 +173,19 @@ body {
     margin-bottom: -4px;
 }
 
+.listFilters {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.listFilters div {
+    margin-right: 10px;
+}
+
+.dropdown-item {
+    cursor: pointer;
+}
+
 .itemHeader {
     display: flex;
     justify-content: space-between;

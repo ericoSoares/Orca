@@ -98,7 +98,7 @@ const Overview = ({ overview }) => {
                                     </thead>
                                     <tbody>
                                         {overview.entities.map((r, i) => (
-                                            <tr>
+                                            <tr key={Math.random()}>
                                                 <td>{i + 1}</td>
                                                 <td>{r.project}</td>
                                                 <td>{r.type}</td>
@@ -132,7 +132,7 @@ const Overview = ({ overview }) => {
                                     </thead>
                                     <tbody>
                                         {overview.rules.map((r, i) => (
-                                            <tr>
+                                            <tr key={Math.random()}>
                                                 <td>{i + 1}</td>
                                                 <td>{r.name}</td>
                                                 <td>{r.description}</td>
@@ -158,7 +158,7 @@ const Overview = ({ overview }) => {
                                     </thead>
                                     <tbody>
                                         {overview.designPatterns.map((r, i) => (
-                                            <tr>
+                                            <tr key={Math.random()}>
                                                 <td>{i+1}</td>
                                                 <td>{r.name}</td>
                                                 <td>{r.description}</td>

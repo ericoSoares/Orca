@@ -1,15 +1,17 @@
 ﻿import React, { useState, useEffect } from 'react';
 
-const SeveretyLevel = {
-    1: 'BLOCKER',
-    2: 'CRITICAL',
-    3: 'MAJOR',
-    4: 'MINOR',
-    5: 'INFO'
+const SeverityLevel = {
+    1: 'Blocker',
+    2: 'Critical',
+    3: 'Major',
+    4: 'Minor',
+    5: 'Info'
 }
 
 const Report = ({ analysisResult, setSelectedTab }) => {
     const [selectedFileGroup, setSelectedFileGroup] = useState(null);
+    const [severityFilter, setSeverityFilter] = useState(0);
+    const [dpFilter, setDpFilter] = useState('');
 
     useEffect(() => {
         if (analysisResult.ruleResultGroups.length) {
@@ -44,7 +46,7 @@ const Report = ({ analysisResult, setSelectedTab }) => {
                     </h6>
                     <ul class="nav flex-column mb-2">
                         {analysisResult.ruleResultGroups.map(r => (
-                            <li class="nav-item">
+                            <li class="nav-item" key={Math.random()}>
                                 <a class={`nav-link ${selectedFileGroup && selectedFileGroup.filePath === r.filePath && "active"}`}
                                     href="#"
                                     onClick={() => setSelectedFileGroup(r)}
@@ -65,8 +67,37 @@ const Report = ({ analysisResult, setSelectedTab }) => {
         return (
             <div>
                 <div class="listHeader mb-4"><h4>File</h4><h3>{selectedFileGroup.filePath}</h3></div>
-                {selectedFileGroup.ruleResults.sort((a, b) => a.severityLevel - b.severityLevel).map(r => (
-                    <div class="listItem">
+                <div className="listFilters">
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {SeverityLevel[severityFilter] || 'Severity Level'}
+                    </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" onClick={() => setSeverityFilter(0)}>All</a>
+                            <a class="dropdown-item" onClick={() => setSeverityFilter(1)}>Blocker</a>
+                            <a class="dropdown-item" onClick={() => setSeverityFilter(2)}>Critical</a>
+                            <a class="dropdown-item" onClick={() => setSeverityFilter(3)}>Major</a>
+                            <a class="dropdown-item" onClick={() => setSeverityFilter(4)}>Minor</a>
+                            <a class="dropdown-item" onClick={() => setSeverityFilter(5)}>Info</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {dpFilter || 'Design Pattern'}
+                    </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" onClick={() => setDpFilter('')}>All</a>  
+                            {analysisResult.overview.designPatterns.map(r => (
+                                <a key={Math.random()} class="dropdown-item" onClick={() => setDpFilter(r.name)}>{r.name}</a>  
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                {selectedFileGroup.ruleResults
+                    .filter(r => r.dpName === dpFilter || dpFilter === '')
+                    .filter(r => r.severityLevel === severityFilter || severityFilter === 0)
+                    .sort((a, b) => a.severityLevel - b.severityLevel).map(r => (
+                    <div class="listItem" key={Math.random()}>
                         <div class="itemHeader">
                             <p class="ruleDescription">
                                 {r.ruleDescription}
