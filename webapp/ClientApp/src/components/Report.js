@@ -49,8 +49,8 @@ const Report = ({ analysisResult, setSelectedTab }) => {
                                     href="#"
                                     onClick={() => setSelectedFileGroup(r)}
                                 >
-                                    <span className="fileRuleCount">{r.ruleResults.length}</span>
                                     <span>{r.fileName}</span>
+                                    <span className="fileRuleCount">{r.ruleResults.length}</span>
                                 </a>
                             </li>    
                         ))}
@@ -77,7 +77,7 @@ const Report = ({ analysisResult, setSelectedTab }) => {
                         </div>
                         <div class="itemBody">
                             <p class="secondLineInfo">
-                                {r.ruleName}, {r.dpName}
+                                {r.ruleName}, <a href={r.dpExtraInfo} target="blank">{r.dpName} Pattern</a>
                         </p>
                             <p class="severityLevel">{renderSeverityLevel(r.severityLevel)}</p>
                         </div>

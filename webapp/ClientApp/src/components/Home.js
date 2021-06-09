@@ -17,7 +17,7 @@ export const Home = ({ triggerAnalysis }) => {
                     width: '100%',
                 }}
             >
-                <div className="card shadow-sm" style={{ padding: 60, marginTop: 100 }}>
+                <div className="card shadow-sm" style={{ padding: 60, marginTop: 100, border: '3px solid black' }}>
                     <div style={{ width: 400 }}>
                         <h2><center>ORCA</center></h2>
                         <br />
@@ -32,6 +32,16 @@ export const Home = ({ triggerAnalysis }) => {
                             />
                         </div>
                         <div className="form-group">
+                            <label style={{ fontWeight: 'bold' }} htmlFor="rulesFile">Rules file (.cs)</label>
+                            <input
+                                id="rulesFile"
+                                className="form-control"
+                                style={{ height: 45, width: '100%'}}
+                                type="file"
+                                onChange={(e) => null} 
+                            />
+                        </div>
+                        <div className="form-group">
                             <label style={{ fontWeight: 'bold' }} htmlFor="excludedInput">Exclude projects:</label>
                             <textarea
                                 id="excludedInput"
@@ -41,7 +51,11 @@ export const Home = ({ triggerAnalysis }) => {
                                 style={{ width: '100%', height: '100px' }}
                             />
                         </div>
-                        <button className="btn btn-primary" onClick={() => setAnalysisTriggered(true)}>Analyze</button>
+                        <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+                            <button
+                                style={{ background: 'black' }}
+                                className="btn btn-primary" onClick={() => setAnalysisTriggered(true)}>Analyze</button>
+                        </div>
                     </div>
                 </div>
             </div>
