@@ -19,7 +19,7 @@ export const Home = ({ triggerAnalysis }) => {
             >
                 <div className="card shadow-sm" style={{ padding: 60, marginTop: 100 }}>
                     <div style={{ width: 400 }}>
-                        <h2><center>RePattern</center></h2>
+                        <h2><center>ORCA</center></h2>
                         <br />
                         <div className="form-group">
                             <label style={{fontWeight: 'bold'}} htmlFor="slnPathInput">Solution path (.sln)</label>
