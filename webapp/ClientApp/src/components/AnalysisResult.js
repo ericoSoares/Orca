@@ -27,7 +27,7 @@ const AnalysisResult = ({ slnPath, excludedProjects, setAnalysisTriggered }) => 
     if (loading) return <div className="loadingScreen">Analisando...</div>;
 
     return (
-        <div>
+        <div style={{paddingBottom: 20}}>
             <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
                 <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">RePattern</a>
                 <div className="navbarListContainer">

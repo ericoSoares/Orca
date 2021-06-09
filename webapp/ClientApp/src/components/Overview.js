@@ -2,77 +2,83 @@
 import { Pie } from 'react-chartjs-2';
 import { Bar } from 'react-chartjs-2';
 
-const data = {
-    labels: ['Inheritance', 'Implementation', 'Dependency', 'Instantiation', 'Reception'],
-    datasets: [
-        {
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2],
-            backgroundColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192,1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)',
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)',
-            ],
-            borderWidth: 1,
-        },
-    ],
-};
 
-const options = {
-    plugins: {
-        legend: {
-            display: true,
-            position: 'top'
-        }
+
+const getSeverityLevel = (level) => {
+    switch (level) {
+        case 1:
+            return 'BLOCKER';
+        case 2:
+            return 'CRITICAL';
+        case 3:
+            return 'MAJOR';
+        case 4:
+            return 'MINOR';
+        case 5:
+            return 'INFO';
     }
-};
-
-const data2 = {
-    labels: ['Blocker', 'Critical', 'Major', 'Minor', 'Info'],
-    datasets: [
-        {
-            label: '# of detected opportunities',
-            data: [12, 19, 3, 5, 2],
-            backgroundColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-            ],
-            borderWidth: 1,
-        },
-    ],
-};
+}
 
 const Overview = ({ overview }) => {
+    const pieData = {
+        labels: ['Inheritance', 'Implementation', 'Dependency', 'Instantiation', 'Reception'],
+        datasets: [
+            {
+                label: '# of Votes',
+                data: [overview.relationships.inheritances, overview.relationships.implementations, overview.relationships.dependencies, overview.relationships.instantiations, overview.relationships.receptions],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192,1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                ],
+                borderWidth: 1,
+            },
+        ],
+    };
+
+    const barsData = {
+        labels: ['Blocker', 'Critical', 'Major', 'Minor', 'Info'],
+        datasets: [
+            {
+                label: '# of detected opportunities',
+                data: [overview.opportunitiesBlocker, overview.opportunitiesCritical, overview.opportunitiesMajor, overview.opportunitiesMinor, overview.opportunitiesInfo],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                ],
+                borderWidth: 1,
+            },
+        ],
+    };
     return (
-        <div>
             <main role="main" class="col-10 offset-1 px-4 mb-4">
                 <h4 className="mb-4">Dashboard</h4>
                 <div className="container-fluid">
                     <div className="row">
                         <div className="card shadow-sm col-12 dashboardCard">
-                            <h6>Opportunities</h6>
-                            <Bar height="100" data={data2} />
+                        <h6>Opportunities</h6>
+                        <Bar height="100" data={barsData} />
                         </div>
                     </div>
 
@@ -93,7 +99,7 @@ const Overview = ({ overview }) => {
                                     <tbody>
                                         {overview.entities.map((r, i) => (
                                             <tr>
-                                                <td>{i}</td>
+                                                <td>{i + 1}</td>
                                                 <td>{r.project}</td>
                                                 <td>{r.type}</td>
                                                 <td>{r.name}</td>
@@ -106,7 +112,7 @@ const Overview = ({ overview }) => {
                         </div>
                         <div className="card shadow-sm col-4 dashboardCard">
                             <h6>Relationships</h6>
-                            <Pie height="40" data={data} />
+                            <Pie height="40" data={pieData} />
                         </div>
                     </div>
 
@@ -127,10 +133,10 @@ const Overview = ({ overview }) => {
                                     <tbody>
                                         {overview.rules.map((r, i) => (
                                             <tr>
-                                                <td>{i}</td>
+                                                <td>{i + 1}</td>
                                                 <td>{r.name}</td>
                                                 <td>{r.description}</td>
-                                                <td>{r.severityLevel}</td>
+                                                <td>{getSeverityLevel(r.severityLevel)}</td>
                                                 <td>{r.dpName}</td>
                                             </tr>
                                         ))}
@@ -153,7 +159,7 @@ const Overview = ({ overview }) => {
                                     <tbody>
                                         {overview.designPatterns.map((r, i) => (
                                             <tr>
-                                                <td>{i}</td>
+                                                <td>{i+1}</td>
                                                 <td>{r.name}</td>
                                                 <td>{r.description}</td>
                                                 <td><a href={r.moreInfoUrl} target="blank">{r.moreInfoUrl}</a></td>
@@ -166,7 +172,6 @@ const Overview = ({ overview }) => {
                     </div>
                 </div>
             </main>
-        </div>
     )
 }
 

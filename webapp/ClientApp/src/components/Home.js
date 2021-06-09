@@ -19,8 +19,10 @@ export const Home = ({ triggerAnalysis }) => {
             >
                 <div className="card shadow-sm" style={{ padding: 60, marginTop: 100 }}>
                     <div style={{ width: 400 }}>
+                        <h2><center>RePattern</center></h2>
+                        <br />
                         <div className="form-group">
-                            <label htmlFor="slnPathInput">Caminho da Solution (.sln)</label>
+                            <label style={{fontWeight: 'bold'}} htmlFor="slnPathInput">Solution path (.sln)</label>
                             <input
                                 id="slnPathInput"
                                 className="form-control"
@@ -30,16 +32,16 @@ export const Home = ({ triggerAnalysis }) => {
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="excludedInput">Excluir projetos:</label>
+                            <label style={{ fontWeight: 'bold' }} htmlFor="excludedInput">Exclude projects:</label>
                             <textarea
                                 id="excludedInput"
                                 className="form-control"
-                                placeholder="separar projetos com ;"
+                                placeholder="Separate projects with semicolon"
                                 onChange={(e) => setExcludedProjects(e.target.value)}
                                 style={{ width: '100%', height: '100px' }}
                             />
                         </div>
-                        <button className="btn btn-primary" onClick={() => setAnalysisTriggered(true)}>Analisar</button>
+                        <button className="btn btn-primary" onClick={() => setAnalysisTriggered(true)}>Analyze</button>
                     </div>
                 </div>
             </div>
