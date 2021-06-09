@@ -11,7 +11,6 @@ const AnalysisResult = ({ slnPath, excludedProjects, setAnalysisTriggered }) => 
 
     useEffect(() => {
         const fetchData = async () => {
-            console.log(slnPath, excludedProjects);
             const response = await fetch('analysis?slnPath=' + slnPath + '&excluded=' + excludedProjects);
             const data = await response.json();
             setAnalysisResult(data);
@@ -22,26 +21,26 @@ const AnalysisResult = ({ slnPath, excludedProjects, setAnalysisTriggered }) => 
             setDataLoaded(true);
         }
 
-    }, []);
+    }, [dataLoaded, excludedProjects, slnPath]);
 
     if (loading) return <div className="loadingScreen">Analyzing...</div>;
 
     return (
         <div style={{paddingBottom: 20}}>
-            <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-                <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">ORCA</a>
+            <nav className="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+                <a className="navbar-brand col-sm-3 col-md-2 mr-0" href="#">ORCA</a>
                 <div className="navbarListContainer">
-                    <ul class="navbar-nav px-3">
-                        <li class="nav-item px-2 text-nowrap">
-                            <a class="nav-link" href="#" onClick={() => setSelectedTab(0)}>Overview</a>
+                    <ul className="navbar-nav px-3">
+                        <li className="nav-item px-2 text-nowrap">
+                            <a className="nav-link" href="#" onClick={() => setSelectedTab(0)}>Overview</a>
                         </li>
-                        <li class="nav-item px-3 text-nowrap">
-                            <a class="nav-link" href="#" onClick={() => setSelectedTab(1)}>Report</a>
+                        <li className="nav-item px-3 text-nowrap">
+                            <a className="nav-link" href="#" onClick={() => setSelectedTab(1)}>Report</a>
                         </li>
                     </ul>
-                    <ul class="navbar-nav px-3">
-                        <li class="nav-item text-nowrap">
-                            <a class="nav-link" href="#" onClick={() => setAnalysisTriggered(false)}>New Analysis</a>
+                    <ul className="navbar-nav px-3">
+                        <li className="nav-item text-nowrap">
+                            <a className="nav-link" href="#" onClick={() => setAnalysisTriggered(false)}>New Analysis</a>
                         </li>
                     </ul>
                 </div>

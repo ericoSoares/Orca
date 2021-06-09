@@ -1,8 +1,6 @@
-﻿import React, { useState } from 'react';
+﻿import React from 'react';
 import { Pie } from 'react-chartjs-2';
 import { Bar } from 'react-chartjs-2';
-
-
 
 const getSeverityLevel = (level) => {
     switch (level) {
@@ -15,6 +13,8 @@ const getSeverityLevel = (level) => {
         case 4:
             return 'MINOR';
         case 5:
+            return 'INFO';
+        default:
             return 'INFO';
     }
 }
@@ -72,7 +72,7 @@ const Overview = ({ overview }) => {
         ],
     };
     return (
-            <main role="main" class="col-10 offset-1 px-4 mb-4">
+            <main role="main" className="col-10 offset-1 px-4 mb-4">
                 <h4 className="mb-4">Dashboard</h4>
                 <div className="container-fluid">
                     <div className="row">
@@ -85,8 +85,8 @@ const Overview = ({ overview }) => {
                     <div className="row">
                         <div className="card shadow-sm col-8 dashboardCard">
                             <h6>Entities</h6>
-                            <div class="table-responsive" style={{height: 400, overflow: 'auto'}}>
-                                <table class="table table-striped table-sm">
+                            <div className="table-responsive" style={{height: 400, overflow: 'auto'}}>
+                                <table className="table table-striped table-sm">
                                     <thead>
                                         <tr>
                                             <th>#</th>
@@ -119,8 +119,8 @@ const Overview = ({ overview }) => {
                     <div className="row">
                         <div className="card shadow-sm col-6 dashboardCard">
                             <h6>Rules</h6>
-                            <div class="table-responsive" style={{ height: 400, overflow: 'auto' }}>
-                                <table class="table table-striped table-sm">
+                            <div className="table-responsive" style={{ height: 400, overflow: 'auto' }}>
+                                <table className="table table-striped table-sm">
                                     <thead>
                                         <tr>
                                             <th>#</th>
@@ -146,8 +146,8 @@ const Overview = ({ overview }) => {
                         </div>
                         <div className="card shadow-sm col-6 dashboardCard">
                             <h6>Design Patterns</h6>
-                            <div class="table-responsive" style={{ height: 400, overflow: 'auto' }}>
-                                <table class="table table-striped table-sm">
+                            <div className="table-responsive" style={{ height: 400, overflow: 'auto' }}>
+                                <table className="table table-striped table-sm">
                                     <thead>
                                         <tr>
                                             <th>#</th>

@@ -17,7 +17,7 @@ const Report = ({ analysisResult, setSelectedTab }) => {
         if (analysisResult.ruleResultGroups.length) {
             setSelectedFileGroup(analysisResult.ruleResultGroups[0])
         }
-    }, []);
+    }, [analysisResult.ruleResultGroups]);
 
     const renderSeverityLevel = (level) => {
         switch (level) {
@@ -31,23 +31,25 @@ const Report = ({ analysisResult, setSelectedTab }) => {
                 return <span className="severityMinor">MINOR</span>;
             case 5:
                 return <span className="severityInfo">INFO</span>;
+            default:
+                return <span className="severityInfo">INFO</span>;
         }
     }
 
     const renderFilesMenu = () => {
         return (
-            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-                <div class="sidebar-sticky">
-                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+            <nav className="col-md-2 d-none d-md-block bg-light sidebar">
+                <div className="sidebar-sticky">
+                    <h6 className="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                         <span>Files</span>
-                        <a class="d-flex align-items-center text-muted" href="#">
+                        <a className="d-flex align-items-center text-muted" href="#">
                             <span data-feather="plus-circle"></span>
                         </a>
                     </h6>
-                    <ul class="nav flex-column mb-2">
+                    <ul className="nav flex-column mb-2">
                         {analysisResult.ruleResultGroups.map(r => (
-                            <li class="nav-item" key={Math.random()}>
-                                <a class={`nav-link ${selectedFileGroup && selectedFileGroup.filePath === r.filePath && "active"}`}
+                            <li className="nav-item" key={Math.random()}>
+                                <a className={`nav-link ${selectedFileGroup && selectedFileGroup.filePath === r.filePath && "active"}`}
                                     href="#"
                                     onClick={() => setSelectedFileGroup(r)}
                                 >
@@ -66,29 +68,29 @@ const Report = ({ analysisResult, setSelectedTab }) => {
         if (!selectedFileGroup) return <div></div>;
         return (
             <div>
-                <div class="listHeader mb-4"><h4>File</h4><h3>{selectedFileGroup.filePath}</h3></div>
+                <div className="listHeader mb-4"><h4>File</h4><h3>{selectedFileGroup.filePath}</h3></div>
                 <div className="listFilters">
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <div className="dropdown">
+                        <button className="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {SeverityLevel[severityFilter] || 'Severity Level'}
                     </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" onClick={() => setSeverityFilter(0)}>All</a>
-                            <a class="dropdown-item" onClick={() => setSeverityFilter(1)}>Blocker</a>
-                            <a class="dropdown-item" onClick={() => setSeverityFilter(2)}>Critical</a>
-                            <a class="dropdown-item" onClick={() => setSeverityFilter(3)}>Major</a>
-                            <a class="dropdown-item" onClick={() => setSeverityFilter(4)}>Minor</a>
-                            <a class="dropdown-item" onClick={() => setSeverityFilter(5)}>Info</a>
+                        <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a className="dropdown-item" onClick={() => setSeverityFilter(0)}>All</a>
+                            <a className="dropdown-item" onClick={() => setSeverityFilter(1)}>Blocker</a>
+                            <a className="dropdown-item" onClick={() => setSeverityFilter(2)}>Critical</a>
+                            <a className="dropdown-item" onClick={() => setSeverityFilter(3)}>Major</a>
+                            <a className="dropdown-item" onClick={() => setSeverityFilter(4)}>Minor</a>
+                            <a className="dropdown-item" onClick={() => setSeverityFilter(5)}>Info</a>
                         </div>
                     </div>
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <div className="dropdown">
+                        <button className="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {dpFilter || 'Design Pattern'}
                     </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" onClick={() => setDpFilter('')}>All</a>  
+                        <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a className="dropdown-item" onClick={() => setDpFilter('')}>All</a>  
                             {analysisResult.overview.designPatterns.map(r => (
-                                <a key={Math.random()} class="dropdown-item" onClick={() => setDpFilter(r.name)}>{r.name}</a>  
+                                <a key={Math.random()} className="dropdown-item" onClick={() => setDpFilter(r.name)}>{r.name}</a>  
                             ))}
                         </div>
                     </div>
@@ -97,20 +99,20 @@ const Report = ({ analysisResult, setSelectedTab }) => {
                     .filter(r => r.dpName === dpFilter || dpFilter === '')
                     .filter(r => r.severityLevel === severityFilter || severityFilter === 0)
                     .sort((a, b) => a.severityLevel - b.severityLevel).map(r => (
-                    <div class="listItem" key={Math.random()}>
-                        <div class="itemHeader">
-                            <p class="ruleDescription">
+                    <div className="listItem" key={Math.random()}>
+                        <div className="itemHeader">
+                            <p className="ruleDescription">
                                 {r.ruleDescription}
                         </p>
-                            <p class="ruleLineNumber">
+                            <p className="ruleLineNumber">
                                 Line {r.lineNumber}
                         </p>
                         </div>
-                        <div class="itemBody">
-                            <p class="secondLineInfo">
+                        <div className="itemBody">
+                            <p className="secondLineInfo">
                                 {r.ruleName}, <a href={r.dpExtraInfo} target="blank">{r.dpName} Pattern</a>
                         </p>
-                            <p class="severityLevel">{renderSeverityLevel(r.severityLevel)}</p>
+                            <p className="severityLevel">{renderSeverityLevel(r.severityLevel)}</p>
                         </div>
                     </div>    
                 ))}
@@ -122,7 +124,7 @@ const Report = ({ analysisResult, setSelectedTab }) => {
     return (
         <div>
             {renderFilesMenu()}
-            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            <main role="main" className="col-md-9 ml-sm-auto col-lg-10 px-4">
                 {renderList()}
             </main>
         </div>
