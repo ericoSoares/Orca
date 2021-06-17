@@ -244,11 +244,13 @@ namespace tcc
 			{
 				var declaredSymbol = semanticModel.GetDeclaredSymbol(prop);
 				var type = declaredSymbol.Type;
+				var accessModifiers = prop.Modifiers.ToString();
 				this.Repository.AddRelationship(
 					Models.ERelationshipType.DEPENDENCY,
 					curClassTypeSymbol.ToString(),
 					type.ToString(),
-					prop.GetLocation().GetMappedLineSpan().StartLinePosition.Line);
+					prop.GetLocation().GetMappedLineSpan().StartLinePosition.Line,
+					"", false, accessModifiers);
 
 			}
 
@@ -256,12 +258,13 @@ namespace tcc
 			{
 				var typeSymbol = semanticModel.GetTypeInfo(field.Declaration.Type);
 				var type = typeSymbol.Type.ToString();
-
+				var accessModifiers = field.Modifiers.ToString();
 				this.Repository.AddRelationship(
 					Models.ERelationshipType.DEPENDENCY,
 					curClassTypeSymbol.ToString(),
 					type,
-					field.GetLocation().GetMappedLineSpan().StartLinePosition.Line);
+					field.GetLocation().GetMappedLineSpan().StartLinePosition.Line,
+					"", false, accessModifiers);
 			}
 
 		}

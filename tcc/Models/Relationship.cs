@@ -12,6 +12,7 @@ namespace tcc.Models
         public ERelationshipType Type { get; set; }
         public int LineNumber { get; set; }
         public string MethodName { get; set; }
+        public string AccessModifiers { get; set; }
         public bool IsMethodConstructor { get; set; }
         public string FileName
         {

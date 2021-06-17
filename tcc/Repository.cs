@@ -19,7 +19,8 @@ namespace tcc
         }
 
         public bool AddRelationship(
-            ERelationshipType type, string sourceType, string targetType, int lineNumber, string methodName = "", bool isMethodConstructor = false)
+            ERelationshipType type, string sourceType, string targetType, int lineNumber, string methodName = "", bool isMethodConstructor = false,
+            string accessModifiers = "")
         {
             var foundSource = this.Entities.FirstOrDefault(r => r.SemanticType == sourceType);
             var foundTarget = this.Entities.FirstOrDefault(r => r.SemanticType == targetType);
@@ -32,7 +33,8 @@ namespace tcc
                 Target = foundTarget,
                 Type = type,
                 IsMethodConstructor = isMethodConstructor,
-                MethodName = methodName
+                MethodName = methodName,
+                AccessModifiers = accessModifiers
             };
 
             this.Relationships.Add(relationship);

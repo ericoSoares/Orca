@@ -24,6 +24,7 @@ namespace SemanticQuickStart
             extractor.Run();
             extractor.Repository.PrintStatus();
             var porra4 = extractor.Repository.Relationships.Where(r => r.Type == tcc.Models.ERelationshipType.IMPLEMENTATION).ToList();
+            var porra5 = extractor.Repository.Relationships.Where(r => r.Type == tcc.Models.ERelationshipType.DEPENDENCY).ToList();
             var porra = extractor.Repository.Relationships.Where(r => r.Type == tcc.Models.ERelationshipType.INSTANTIATION_IN_CLASS).ToList();
             var porra2 = extractor.Repository.Relationships.Where(r => r.Type == tcc.Models.ERelationshipType.INSTANTIATION_IN_METHOD).ToList();
             var porra3 = extractor.Repository.Relationships.Where(r => r.Type == tcc.Models.ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR).ToList();

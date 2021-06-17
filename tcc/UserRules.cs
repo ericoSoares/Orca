@@ -18,14 +18,12 @@ namespace tcc
 
         public override IList<RuleResult> Execute(Repository repository)
         {
-            var results = new List<RuleResult>();
-
-            var classesWithTooManyInstantiations = repository
-                .Entities
+            return repository.Entities
                 .Where(r => r.SourceRelationships
-                    .Where(r => r.Type == ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR
-                        || r.Type == ERelationshipType.INSTANTIATION_IN_CLASS
-                        || r.Type == ERelationshipType.INSTANTIATION_IN_METHOD)
+                    .Where(x => x.Type == ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR
+                        || x.Type == ERelationshipType.INSTANTIATION_IN_CLASS
+                        || x.Type == ERelationshipType.INSTANTIATION_IN_METHOD)
+                    .GroupBy(y => y.Target.SemanticType)
                     .Count() >= 3)
                 .Select(r => new RuleResult()
                 {
@@ -34,8 +32,6 @@ namespace tcc
                     Rule = this
                 })
                 .ToList();
-
-            return classesWithTooManyInstantiations;
         }
     }
 
@@ -44,21 +40,16 @@ namespace tcc
         public FactoryRule2()
         {
             this.Name = "FatoryRule2";
-            this.Description = "Um método não pode instanciar uma classe mais do que 3 vezes";
+            this.Description = "Um método não construtor não pode instanciar classes mais do que 3 vezes";
             this.DesignPattern = this.DesignPatternRepository.Factory;
             this.SeverityLevel = ESeverityLevel.BLOCKER;
         }
 
         public override IList<RuleResult> Execute(Repository repository)
         {
-            var results = new List<RuleResult>();
-
-            var classesWithTooManyInstantiations = repository
-                .Entities
+            return repository.Entities
                 .Where(r => r.SourceRelationships
-                    .Where(r => r.Type == ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR
-                        || r.Type == ERelationshipType.INSTANTIATION_IN_CLASS
-                        || r.Type == ERelationshipType.INSTANTIATION_IN_METHOD)
+                    .Where(x => x.Type == ERelationshipType.INSTANTIATION_IN_METHOD)
                     .Count() >= 3)
                 .Select(r => new RuleResult()
                 {
@@ -67,41 +58,6 @@ namespace tcc
                     Rule = this
                 })
                 .ToList();
-
-            return classesWithTooManyInstantiations;
-        }
-    }
-
-    public class FactoryRule3 : Rule
-    {
-        public FactoryRule3()
-        {
-            this.Name = "FatoryRule3";
-            this.Description = "Uma classe instancia classes da 'mesma familia' mais de uma vez";
-            this.DesignPattern = this.DesignPatternRepository.Factory;
-            this.SeverityLevel = ESeverityLevel.MINOR;
-        }
-
-        public override IList<RuleResult> Execute(Repository repository)
-        {
-            var results = new List<RuleResult>();
-
-            var classesWithTooManyInstantiations = repository
-                .Entities
-                .Where(r => r.SourceRelationships
-                    .Where(r => r.Type == ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR
-                        || r.Type == ERelationshipType.INSTANTIATION_IN_CLASS
-                        || r.Type == ERelationshipType.INSTANTIATION_IN_METHOD)
-                    .Count() >= 3)
-                .Select(r => new RuleResult()
-                {
-                    FilePath = r.FilePath,
-                    LineNumber = r.LineNumber,
-                    Rule = this
-                })
-                .ToList();
-
-            return classesWithTooManyInstantiations;
         }
     }
 
@@ -109,14 +65,57 @@ namespace tcc
     {
         public BuilderRule1()
         {
-            this.Name = "Builder";
+            this.Name = "BuilderRule1";
             this.Description = "Se uma classe tiver mais que 5 dependencias, pode ser um caso de builder";
             this.DesignPattern = this.DesignPatternRepository.Builder;
         }
 
         public override IList<RuleResult> Execute(Repository repository)
         {
-            return new List<RuleResult>();
+            return repository.Entities
+                .Where(r => r.SourceRelationships
+                    .Where(x => x.Type == ERelationshipType.DEPENDENCY)
+                    .Count() >= 5)
+                .Select(r => new RuleResult()
+                {
+                    FilePath = r.FilePath,
+                    LineNumber = r.LineNumber,
+                    Rule = this
+                })
+                .ToList();
+        }
+    }
+
+    public class PrototypeRule1 : Rule
+    {
+        public PrototypeRule1()
+        {
+            this.Name = "PrototypeRule1";
+            this.Description = "Classe possui mais de 3 dependencias publicas e não possui recepções nem instanciações em construtor";
+            this.DesignPattern = this.DesignPatternRepository.Singleton;
+        }
+
+        public override IList<RuleResult> Execute(Repository repository)
+        {
+            var classesWithMoreThan3PublicDependencies = repository.Entities
+                .Where(r => r.SourceRelationships
+                    .Where(x => x.Type == ERelationshipType.DEPENDENCY && x.AccessModifiers.Contains("public"))
+                    .Count() > 3);
+            return repository.Entities
+                .Where(r => r.SourceRelationships
+                    .Where(x => x.Type == ERelationshipType.DEPENDENCY && x.AccessModifiers.Contains("public"))
+                    .Count() > 3)
+                .Where(r => r.SourceRelationships
+                    .Where(x => x.Type == ERelationshipType.RECEPTION_IN_CONSTRUCTOR 
+                        || x.Type == ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR)
+                    .Count() == 0)
+                .Select(r => new RuleResult()
+                {
+                    FilePath = r.FilePath,
+                    LineNumber = r.LineNumber,
+                    Rule = this
+                })
+                .ToList();
         }
     }
 
@@ -125,13 +124,24 @@ namespace tcc
         public SingletonRule1()
         {
             this.Name = "SingletonRule1";
-            this.Description = "Classes sem dependencias podem ser Singletons";
+            this.Description = "Classes estáticas sem dependencias podem ser Singletons";
             this.DesignPattern = this.DesignPatternRepository.Singleton;
         }
 
         public override IList<RuleResult> Execute(Repository repository)
         {
-            return new List<RuleResult>();
+            return repository.Entities
+                .Where(r => r.AccessModifier.Contains("static"))
+                .Where(r => r.SourceRelationships
+                    .Where(r => r.Type == ERelationshipType.DEPENDENCY)
+                    .Count() == 0)
+                .Select(r => new RuleResult()
+                {
+                    FilePath = r.FilePath,
+                    LineNumber = r.LineNumber,
+                    Rule = this
+                })
+                .ToList();
         }
     }
 
