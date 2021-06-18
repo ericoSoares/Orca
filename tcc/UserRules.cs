@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace tcc
 {
+    // Creational
     public class FactoryRule1 : Rule
     {
         public FactoryRule1()
@@ -42,7 +43,7 @@ namespace tcc
             this.Name = "FatoryRule2";
             this.Description = "Um método não construtor não pode instanciar classes mais do que 3 vezes";
             this.DesignPattern = this.DesignPatternRepository.Factory;
-            this.SeverityLevel = ESeverityLevel.BLOCKER;
+            this.SeverityLevel = ESeverityLevel.MAJOR;
         }
 
         public override IList<RuleResult> Execute(Repository repository)
@@ -68,6 +69,7 @@ namespace tcc
             this.Name = "BuilderRule1";
             this.Description = "Se uma classe tiver mais que 5 dependencias, pode ser um caso de builder";
             this.DesignPattern = this.DesignPatternRepository.Builder;
+            this.SeverityLevel = ESeverityLevel.MINOR;
         }
 
         public override IList<RuleResult> Execute(Repository repository)
@@ -86,13 +88,14 @@ namespace tcc
         }
     }
 
-    public class PrototypeRule1 : Rule
+    public class BuilderRule2 : Rule
     {
-        public PrototypeRule1()
+        public BuilderRule2()
         {
             this.Name = "PrototypeRule1";
-            this.Description = "Classe possui mais de 3 dependencias publicas e não possui recepções nem instanciações em construtor";
-            this.DesignPattern = this.DesignPatternRepository.Singleton;
+            this.Description = "Classe possui dependencias publicas e não possui recepções nem instanciações em construtor";
+            this.DesignPattern = this.DesignPatternRepository.Builder;
+            this.SeverityLevel = ESeverityLevel.BLOCKER;
         }
 
         public override IList<RuleResult> Execute(Repository repository)
@@ -100,15 +103,17 @@ namespace tcc
             var classesWithMoreThan3PublicDependencies = repository.Entities
                 .Where(r => r.SourceRelationships
                     .Where(x => x.Type == ERelationshipType.DEPENDENCY && x.AccessModifiers.Contains("public"))
-                    .Count() > 3);
-            return repository.Entities
+                    .Count() > 0)
+                .ToList();
+
+            var classesWithNoConstructorRelationships = classesWithMoreThan3PublicDependencies
                 .Where(r => r.SourceRelationships
-                    .Where(x => x.Type == ERelationshipType.DEPENDENCY && x.AccessModifiers.Contains("public"))
-                    .Count() > 3)
-                .Where(r => r.SourceRelationships
-                    .Where(x => x.Type == ERelationshipType.RECEPTION_IN_CONSTRUCTOR 
-                        || x.Type == ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR)
+                    .Where(x => x.Type == ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR
+                        || x.Type == ERelationshipType.RECEPTION_IN_CONSTRUCTOR)
                     .Count() == 0)
+                .ToList();
+
+            return classesWithNoConstructorRelationships
                 .Select(r => new RuleResult()
                 {
                     FilePath = r.FilePath,
@@ -126,6 +131,7 @@ namespace tcc
             this.Name = "SingletonRule1";
             this.Description = "Classes estáticas sem dependencias podem ser Singletons";
             this.DesignPattern = this.DesignPatternRepository.Singleton;
+            this.SeverityLevel = ESeverityLevel.INFO;
         }
 
         public override IList<RuleResult> Execute(Repository repository)
@@ -145,6 +151,7 @@ namespace tcc
         }
     }
 
+    // Structural
     public class CompositeRule1 : Rule
     {
         public CompositeRule1()
@@ -152,11 +159,135 @@ namespace tcc
             this.Name = "CompositeRule1";
             this.Description = "Herança em profundidade maior que 3 não é permitida";
             this.DesignPattern = this.DesignPatternRepository.Composite;
+            this.SeverityLevel = ESeverityLevel.BLOCKER;
         }
 
         public override IList<RuleResult> Execute(Repository repository)
         {
-            return new List<RuleResult>();
+            return repository.Entities
+                .Where(r => r.SourceRelationships
+                    .Where(x => x.Type == ERelationshipType.INHERITANCE)
+                    .Count() > 2)
+                .Select(r => new RuleResult()
+                {
+                    FilePath = r.FilePath,
+                    LineNumber = r.LineNumber,
+                    Rule = this
+                })
+                .ToList();
+        }
+    }
+
+    public class BridgeRule1 : Rule
+    {
+        public BridgeRule1()
+        {
+            this.Name = "BridgeRule1";
+            this.Description = "Classe contem mais de 6 subclasses";
+            this.DesignPattern = this.DesignPatternRepository.Composite;
+            this.SeverityLevel = ESeverityLevel.INFO;
+        }
+
+        public override IList<RuleResult> Execute(Repository repository)
+        {
+            return repository.Entities
+                .Where(r => r.TargetRelationships
+                    .Where(x => x.Type == ERelationshipType.INHERITANCE)
+                    .Count() > 6)
+                .Select(r => new RuleResult()
+                {
+                    FilePath = r.FilePath,
+                    LineNumber = r.LineNumber,
+                    Rule = this
+                })
+                .ToList();
+        }
+    }
+
+    public class FacadeRule1 : Rule
+    {
+        public FacadeRule1()
+        {
+            this.Name = "FacadeRule1";
+            this.Description = "Uma classe está instanciando classes de outro projeto muitas vezes";
+            this.DesignPattern = this.DesignPatternRepository.Composite;
+            this.SeverityLevel = ESeverityLevel.BLOCKER;
+        }
+
+        public override IList<RuleResult> Execute(Repository repository)
+        {
+            return repository.Entities
+                .Where(r => r.SourceRelationships
+                    .Where(x => x.Type == ERelationshipType.INSTANTIATION_IN_CLASS
+                        || x.Type == ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR
+                        || x.Type == ERelationshipType.INSTANTIATION_IN_METHOD)
+                    .Where(x => x.Target.ProjectName != r.ProjectName)
+                    .Count() > 3)
+                .Select(r => new RuleResult()
+                {
+                    FilePath = r.FilePath,
+                    LineNumber = r.LineNumber,
+                    Rule = this
+                })
+                .ToList();
+        }
+    }
+
+    public class FlyweightRule1 : Rule
+    {
+        public FlyweightRule1()
+        {
+            this.Name = "FlyweightRule1";
+            this.Description = "Muitas classes de um mesmo projeto dependem de uma classe de outro projeto";
+            this.DesignPattern = this.DesignPatternRepository.Composite;
+            this.SeverityLevel = ESeverityLevel.MINOR;
+        }
+
+        public override IList<RuleResult> Execute(Repository repository)
+        {
+            return repository.Entities
+                .Where(r => r.SourceRelationships
+                    .Where(x => x.Type == ERelationshipType.INSTANTIATION_IN_CLASS
+                        || x.Type == ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR
+                        || x.Type == ERelationshipType.INSTANTIATION_IN_METHOD)
+                    .Where(x => x.Target.ProjectName != r.ProjectName)
+                    .Count() > 3)
+                .Select(r => new RuleResult()
+                {
+                    FilePath = r.FilePath,
+                    LineNumber = r.LineNumber,
+                    Rule = this
+                })
+                .ToList();
+        }
+    }
+
+    public class MediatorRule1 : Rule
+    {
+        public MediatorRule1()
+        {
+            this.Name = "MediatorRule1";
+            this.Description = "Classes de projetos distintos não devem se comunicar diretamente";
+            this.DesignPattern = this.DesignPatternRepository.Composite;
+            this.SeverityLevel = ESeverityLevel.CRITICAL;
+        }
+
+        public override IList<RuleResult> Execute(Repository repository)
+        {
+            return repository.Entities
+                .Where(r => r.SourceRelationships
+                    .Where(x => x.Type == ERelationshipType.INSTANTIATION_IN_CLASS
+                        || x.Type == ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR
+                        || x.Type == ERelationshipType.INSTANTIATION_IN_METHOD)
+                    .Where(x => x.Target.ProjectName != r.ProjectName)
+                    .Count() > 3)
+                .Select(r => new RuleResult()
+                {
+                    FilePath = r.FilePath,
+                    LineNumber = r.LineNumber,
+                    Rule = this
+                })
+                .ToList();
         }
     }
 }
