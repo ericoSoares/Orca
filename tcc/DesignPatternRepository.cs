@@ -18,6 +18,8 @@ namespace tcc
         public DesignPattern Decorator => new DesignPattern("Decorator", "Composite DP", "www.google.com");
         public DesignPattern Facade => new DesignPattern("Facade", "Composite DP", "www.google.com");
         public DesignPattern Proxy => new DesignPattern("Proxy", "Composite DP", "www.google.com");
+        public DesignPattern Flyweight => new DesignPattern("Flyweight", "Flyweight DP", "www.google.com");
+        public DesignPattern Mediator => new DesignPattern("Mediator", "Mediator DP", "www.google.com");
 
         // Comportamentais
     }

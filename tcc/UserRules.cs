@@ -11,7 +11,7 @@ namespace tcc
     {
         public FactoryRule1()
         {
-            this.Name = "FatoryRule1";
+            this.Name = "FactoryRule1";
             this.Description = "Uma classe A não pode instanciar uma classe B mais de 3 vezes";
             this.DesignPattern = this.DesignPatternRepository.Factory;
             this.SeverityLevel = ESeverityLevel.CRITICAL;
@@ -40,10 +40,10 @@ namespace tcc
     {
         public FactoryRule2()
         {
-            this.Name = "FatoryRule2";
+            this.Name = "FactoryRule2";
             this.Description = "Um método não construtor não pode instanciar classes mais do que 3 vezes";
             this.DesignPattern = this.DesignPatternRepository.Factory;
-            this.SeverityLevel = ESeverityLevel.MAJOR;
+            this.SeverityLevel = ESeverityLevel.MINOR;
         }
 
         public override IList<RuleResult> Execute(Repository repository)
@@ -184,7 +184,7 @@ namespace tcc
         {
             this.Name = "BridgeRule1";
             this.Description = "Classe contem mais de 6 subclasses";
-            this.DesignPattern = this.DesignPatternRepository.Composite;
+            this.DesignPattern = this.DesignPatternRepository.Bridge;
             this.SeverityLevel = ESeverityLevel.INFO;
         }
 
@@ -210,7 +210,7 @@ namespace tcc
         {
             this.Name = "FacadeRule1";
             this.Description = "Uma classe está instanciando classes de outro projeto muitas vezes";
-            this.DesignPattern = this.DesignPatternRepository.Composite;
+            this.DesignPattern = this.DesignPatternRepository.Facade;
             this.SeverityLevel = ESeverityLevel.BLOCKER;
         }
 
@@ -239,7 +239,7 @@ namespace tcc
         {
             this.Name = "FlyweightRule1";
             this.Description = "Muitas classes de um mesmo projeto dependem de uma classe de outro projeto";
-            this.DesignPattern = this.DesignPatternRepository.Composite;
+            this.DesignPattern = this.DesignPatternRepository.Flyweight;
             this.SeverityLevel = ESeverityLevel.MINOR;
         }
 
@@ -268,7 +268,7 @@ namespace tcc
         {
             this.Name = "MediatorRule1";
             this.Description = "Classes de projetos distintos não devem se comunicar diretamente";
-            this.DesignPattern = this.DesignPatternRepository.Composite;
+            this.DesignPattern = this.DesignPatternRepository.Mediator;
             this.SeverityLevel = ESeverityLevel.CRITICAL;
         }
 

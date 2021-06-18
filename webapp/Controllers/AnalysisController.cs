@@ -49,6 +49,7 @@ namespace webapp.Controllers
                         SeverityLevel = x.Rule.SeverityLevel
                     }).ToList()
                 })
+                .OrderByDescending(r => r.RuleResults.Count)
                 .ToList();
 
             var overview = new OverviewDto();

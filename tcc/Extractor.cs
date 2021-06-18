@@ -297,6 +297,7 @@ namespace tcc
 
 					foreach (var doc in proj.Documents)
 					{
+						Console.WriteLine(doc.Name.ToString());
 						var syntaxTree = doc.GetSyntaxTreeAsync().Result;
 						trees.Add(syntaxTree);
 					}

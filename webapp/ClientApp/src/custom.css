@@ -76,6 +76,9 @@ body {
     display: flex;
     justify-content: space-between;
 }
+    .sidebar .nav-item {
+        width: 100%;
+    }
 
     .sidebar .nav-link .feather {
         margin-right: 4px;

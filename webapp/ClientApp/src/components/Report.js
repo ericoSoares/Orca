@@ -53,7 +53,7 @@ const Report = ({ analysisResult, setSelectedTab }) => {
                                     href="#"
                                     onClick={() => setSelectedFileGroup(r)}
                                 >
-                                    <span>{r.fileName}</span>
+                                    <span style={{width: '90%', overflow: 'hidden'}}>{r.fileName}</span>
                                     <span className="fileRuleCount">{r.ruleResults.length}</span>
                                 </a>
                             </li>    
