@@ -25,13 +25,14 @@ namespace tcc
                         || x.Type == ERelationshipType.INSTANTIATION_IN_CLASS
                         || x.Type == ERelationshipType.INSTANTIATION_IN_METHOD)
                     .GroupBy(y => y.Target.SemanticType)
-                    .Count() >= 3)
-                .Select(r => new RuleResult()
-                {
-                    FilePath = r.FilePath,
-                    LineNumber = r.LineNumber,
-                    Rule = this
-                })
+                    .Select(group => new
+                    {
+                        SemanticType = group.Key,
+                        Count = group.Count()
+                    })
+                    .Where(r => r.Count > 3)
+                    .Count() > 0)
+                .Select(r => new RuleResult(r.FilePath, r.LineNumber, this))
                 .ToList();
         }
     }
@@ -41,7 +42,7 @@ namespace tcc
         public FactoryRule2()
         {
             this.Name = "FactoryRule2";
-            this.Description = "Um método não construtor não pode instanciar classes mais do que 3 vezes";
+            this.Description = "Uma classe não pode ter mais que 3 instanciações em métodos";
             this.DesignPattern = this.DesignPatternRepository.Factory;
             this.SeverityLevel = ESeverityLevel.MINOR;
         }
@@ -52,12 +53,7 @@ namespace tcc
                 .Where(r => r.SourceRelationships
                     .Where(x => x.Type == ERelationshipType.INSTANTIATION_IN_METHOD)
                     .Count() >= 3)
-                .Select(r => new RuleResult()
-                {
-                    FilePath = r.FilePath,
-                    LineNumber = r.LineNumber,
-                    Rule = this
-                })
+                .Select(r => new RuleResult(r.FilePath, r.LineNumber, this))
                 .ToList();
         }
     }
@@ -78,12 +74,7 @@ namespace tcc
                 .Where(r => r.SourceRelationships
                     .Where(x => x.Type == ERelationshipType.DEPENDENCY)
                     .Count() >= 5)
-                .Select(r => new RuleResult()
-                {
-                    FilePath = r.FilePath,
-                    LineNumber = r.LineNumber,
-                    Rule = this
-                })
+                .Select(r => new RuleResult(r.FilePath, r.LineNumber, this))
                 .ToList();
         }
     }
@@ -100,13 +91,13 @@ namespace tcc
 
         public override IList<RuleResult> Execute(Repository repository)
         {
-            var classesWithMoreThan3PublicDependencies = repository.Entities
+            var classesWithPublicDependencies = repository.Entities
                 .Where(r => r.SourceRelationships
                     .Where(x => x.Type == ERelationshipType.DEPENDENCY && x.AccessModifiers.Contains("public"))
                     .Count() > 0)
                 .ToList();
 
-            var classesWithNoConstructorRelationships = classesWithMoreThan3PublicDependencies
+            var classesWithNoConstructorRelationships = classesWithPublicDependencies
                 .Where(r => r.SourceRelationships
                     .Where(x => x.Type == ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR
                         || x.Type == ERelationshipType.RECEPTION_IN_CONSTRUCTOR)
@@ -114,12 +105,7 @@ namespace tcc
                 .ToList();
 
             return classesWithNoConstructorRelationships
-                .Select(r => new RuleResult()
-                {
-                    FilePath = r.FilePath,
-                    LineNumber = r.LineNumber,
-                    Rule = this
-                })
+                .Select(r => new RuleResult(r.FilePath, r.LineNumber, this))
                 .ToList();
         }
     }
@@ -141,12 +127,7 @@ namespace tcc
                 .Where(r => r.SourceRelationships
                     .Where(r => r.Type == ERelationshipType.DEPENDENCY)
                     .Count() == 0)
-                .Select(r => new RuleResult()
-                {
-                    FilePath = r.FilePath,
-                    LineNumber = r.LineNumber,
-                    Rule = this
-                })
+                .Select(r => new RuleResult(r.FilePath, r.LineNumber, this))
                 .ToList();
         }
     }
@@ -168,12 +149,7 @@ namespace tcc
                 .Where(r => r.SourceRelationships
                     .Where(x => x.Type == ERelationshipType.INHERITANCE)
                     .Count() > 2)
-                .Select(r => new RuleResult()
-                {
-                    FilePath = r.FilePath,
-                    LineNumber = r.LineNumber,
-                    Rule = this
-                })
+                .Select(r => new RuleResult(r.FilePath, r.LineNumber, this))
                 .ToList();
         }
     }
@@ -194,12 +170,7 @@ namespace tcc
                 .Where(r => r.TargetRelationships
                     .Where(x => x.Type == ERelationshipType.INHERITANCE)
                     .Count() > 6)
-                .Select(r => new RuleResult()
-                {
-                    FilePath = r.FilePath,
-                    LineNumber = r.LineNumber,
-                    Rule = this
-                })
+                .Select(r => new RuleResult(r.FilePath, r.LineNumber, this))
                 .ToList();
         }
     }
@@ -223,12 +194,7 @@ namespace tcc
                         || x.Type == ERelationshipType.INSTANTIATION_IN_METHOD)
                     .Where(x => x.Target.ProjectName != r.ProjectName)
                     .Count() > 3)
-                .Select(r => new RuleResult()
-                {
-                    FilePath = r.FilePath,
-                    LineNumber = r.LineNumber,
-                    Rule = this
-                })
+                .Select(r => new RuleResult(r.FilePath, r.LineNumber, this))
                 .ToList();
         }
     }
@@ -246,18 +212,11 @@ namespace tcc
         public override IList<RuleResult> Execute(Repository repository)
         {
             return repository.Entities
-                .Where(r => r.SourceRelationships
-                    .Where(x => x.Type == ERelationshipType.INSTANTIATION_IN_CLASS
-                        || x.Type == ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR
-                        || x.Type == ERelationshipType.INSTANTIATION_IN_METHOD)
-                    .Where(x => x.Target.ProjectName != r.ProjectName)
+                .Where(r => r.TargetRelationships
+                    .Where(x => x.Type == ERelationshipType.DEPENDENCY)
+                    .Where(x => x.Source.ProjectName != r.ProjectName)
                     .Count() > 3)
-                .Select(r => new RuleResult()
-                {
-                    FilePath = r.FilePath,
-                    LineNumber = r.LineNumber,
-                    Rule = this
-                })
+                .Select(r => new RuleResult(r.FilePath, r.LineNumber, this))
                 .ToList();
         }
     }
@@ -278,15 +237,13 @@ namespace tcc
                 .Where(r => r.SourceRelationships
                     .Where(x => x.Type == ERelationshipType.INSTANTIATION_IN_CLASS
                         || x.Type == ERelationshipType.INSTANTIATION_IN_CONSTRUCTOR
-                        || x.Type == ERelationshipType.INSTANTIATION_IN_METHOD)
+                        || x.Type == ERelationshipType.INSTANTIATION_IN_METHOD
+                        || x.Type == ERelationshipType.RECEPTION_IN_CONSTRUCTOR
+                        || x.Type == ERelationshipType.RECEPTION_IN_METHOD
+                        || x.Type == ERelationshipType.DEPENDENCY)
                     .Where(x => x.Target.ProjectName != r.ProjectName)
-                    .Count() > 3)
-                .Select(r => new RuleResult()
-                {
-                    FilePath = r.FilePath,
-                    LineNumber = r.LineNumber,
-                    Rule = this
-                })
+                    .Count() > 0)
+                .Select(r => new RuleResult(r.FilePath, r.LineNumber, this))
                 .ToList();
         }
     }
