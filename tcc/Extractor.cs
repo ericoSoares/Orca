@@ -240,18 +240,19 @@ namespace tcc
 		{
 			var props = classDeclaration.DescendantNodes().OfType<PropertyDeclarationSyntax>().ToList();
 			var fields = classDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>().ToList();
+
 			foreach(var prop in props)
 			{
 				var declaredSymbol = semanticModel.GetDeclaredSymbol(prop);
 				var type = declaredSymbol.Type;
 				var accessModifiers = prop.Modifiers.ToString();
+				Console.WriteLine(type.ToString());
 				this.Repository.AddRelationship(
 					Models.ERelationshipType.DEPENDENCY,
 					curClassTypeSymbol.ToString(),
-					type.ToString(),
+					type.ToString().Replace("?", ""),
 					prop.GetLocation().GetMappedLineSpan().StartLinePosition.Line,
 					"", false, accessModifiers);
-
 			}
 
 			foreach(var field in fields)
@@ -259,10 +260,11 @@ namespace tcc
 				var typeSymbol = semanticModel.GetTypeInfo(field.Declaration.Type);
 				var type = typeSymbol.Type.ToString();
 				var accessModifiers = field.Modifiers.ToString();
+				Console.WriteLine(type.ToString());
 				this.Repository.AddRelationship(
 					Models.ERelationshipType.DEPENDENCY,
 					curClassTypeSymbol.ToString(),
-					type,
+					type.ToString().Replace("?", ""),
 					field.GetLocation().GetMappedLineSpan().StartLinePosition.Line,
 					"", false, accessModifiers);
 			}
@@ -297,7 +299,6 @@ namespace tcc
 
 					foreach (var doc in proj.Documents)
 					{
-						Console.WriteLine(doc.Name.ToString());
 						var syntaxTree = doc.GetSyntaxTreeAsync().Result;
 						trees.Add(syntaxTree);
 					}

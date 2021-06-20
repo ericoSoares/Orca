@@ -73,7 +73,7 @@ namespace tcc
             return repository.Entities
                 .Where(r => r.SourceRelationships
                     .Where(x => x.Type == ERelationshipType.DEPENDENCY)
-                    .Count() >= 5)
+                    .Count() > 5)
                 .Select(r => new RuleResult(r.FilePath, r.LineNumber, this))
                 .ToList();
         }
@@ -83,7 +83,7 @@ namespace tcc
     {
         public BuilderRule2()
         {
-            this.Name = "PrototypeRule1";
+            this.Name = "BuilderRule2";
             this.Description = "Classe possui dependencias publicas e não possui recepções nem instanciações em construtor";
             this.DesignPattern = this.DesignPatternRepository.Builder;
             this.SeverityLevel = ESeverityLevel.BLOCKER;
