@@ -26,7 +26,12 @@ namespace webapp.Controllers
         public AnalysisResultDto Get(string slnPath = "", string excluded = "")
         {
             var project1 = @"C:\Users\erico\source\repos\clean-architecture-manga\Clean-Architecture-Manga.sln";
-            var project2 = @"C:\Users\erico\source\repos\TestProject\TestProject.sln";
+            var project2 = @"C:\Users\erico\source\repos\DesignPatterns\DesignPatternsDotNetCore.sln";
+            var project3 = @"C:\Users\erico\source\repos\eShopOnWeb2\eShopOnWeb.sln";
+            var project4 = @"C:\Users\erico\source\repos\shadowsocks-windows\shadowsocks-windows.sln";
+            var project5 = @"C:\Users\erico\source\repos\sample-dotnet-core-cqrs-api\src\SampleProject.API.sln";
+            var project6 = @"C:\Users\erico\source\repos\TestProject\TestProject.sln";
+
             var excludedList = excluded.Split(";");
             var extractor = new Extractor(slnPath, excludedList);
             extractor.Run();

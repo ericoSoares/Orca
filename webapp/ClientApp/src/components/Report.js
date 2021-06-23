@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
+import PatternDetails from './PatternDetails';
 
 const SeverityLevel = {
     1: 'Blocker',
@@ -12,6 +13,8 @@ const Report = ({ analysisResult, setSelectedTab }) => {
     const [selectedFileGroup, setSelectedFileGroup] = useState(null);
     const [severityFilter, setSeverityFilter] = useState(0);
     const [dpFilter, setDpFilter] = useState('');
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedDP, setSelectedDP] = useState({name: ''});
 
     useEffect(() => {
         if (analysisResult.ruleResultGroups.length) {
@@ -110,8 +113,13 @@ const Report = ({ analysisResult, setSelectedTab }) => {
                         </div>
                         <div className="itemBody">
                             <p className="secondLineInfo">
-                                {r.ruleName}, <a href={r.dpExtraInfo} target="blank">{r.dpName} Pattern</a>
-                        </p>
+                                {r.ruleName},
+                                <a
+                                    style={{ cursor: 'pointer', marginLeft: 5 }}
+                                    onClick={() => { setSelectedDP({ name: r.dpName }); setModalOpen(true)}}
+                                    target="self"
+                                >{r.dpName} Pattern</a>
+                            </p>
                             <p className="severityLevel">{renderSeverityLevel(r.severityLevel)}</p>
                         </div>
                     </div>    
@@ -126,6 +134,7 @@ const Report = ({ analysisResult, setSelectedTab }) => {
             {renderFilesMenu()}
             <main role="main" className="col-md-9 ml-sm-auto col-lg-10 px-4">
                 {renderList()}
+                <PatternDetails open={modalOpen} setOpen={setModalOpen} patternDetails={selectedDP} />
             </main>
         </div>
     );

@@ -265,4 +265,8 @@ body {
     margin-bottom: 20px;
 }
 
+.modal-content {
+    width: 600px;
+}
+
 
